@@ -66,6 +66,22 @@ export function assignAverageBranchLengths(
 
   for (const [node, mask] of refMasks) {
     if (node === root) continue;
+    const complement = index.fullMask ^ mask;
+
+    // A node whose mask is the entire taxon universe (complement empty) isn't
+    // a real branch at all - it's the artificial "everything" node sitting
+    // just under the tree's top-level stem (see rerootAtNode's unary-root
+    // comment for the same structural quirk). No gene tree can ever have a
+    // clade smaller than its own root that still encloses every taxon, so
+    // this node can never get a real observation - falling back to the
+    // generic "unknown" default of 1 would give it a length wildly larger
+    // than any genuine branch (real lengths are often << 1), dwarfing the
+    // whole tree's actual variation. It isn't a branch, so it gets no length.
+    if (complement === 0n) {
+      node.length = 0;
+      continue;
+    }
+
     // A pendant (leaf) edge only ever involves one taxon, so it can never
     // clear a >=2 threshold - require just "present at all" there; internal
     // branches keep requiring >=2 so a single stray taxon can't drive the estimate.
@@ -81,7 +97,6 @@ export function assignAverageBranchLengths(
 
     node.length = observations.length > 0 ? observations.reduce((a, o) => a + o.length, 0) / observations.length : 1;
 
-    const complement = index.fullMask ^ mask;
     if (popcount(mask) >= 2 && popcount(complement) >= 2) {
       observationsBySplit.set(splitIdFor(mask, index.fullMask), observations);
     }
