@@ -18,8 +18,12 @@ export function loadDatasetFromText(text: string, sourceName: string): Dataset {
 
   const cladeFrequencies = tallyCladeFrequencies(trees, index);
   const referenceTree = buildGreedyConsensus(index, cladeFrequencies);
-  assignAverageBranchLengths(referenceTree, trees, index);
+  const lengthObservations = assignAverageBranchLengths(referenceTree, trees, index);
   const branches = computeBranchRecords(referenceTree, trees, index);
+  for (const [splitId, observations] of lengthObservations) {
+    const record = branches.get(splitId);
+    if (record) record.lengthObservations = observations;
+  }
   const topologyRanking = computeTopologyRanking(trees);
 
   return {

@@ -73,6 +73,19 @@ export interface TaxonInstabilityEntry {
   missingShare: number;
 }
 
+/**
+ * One length reading behind a branch's averaged length estimate. `exact`
+ * means the gene tree actually displayed this branch's precise clade;
+ * otherwise the reading came from a coarser enclosing clade standing in for
+ * it (common wherever the data is discordant), which is a meaningfully
+ * different kind of evidence and shouldn't be visually conflated with a
+ * genuine observation of this branch.
+ */
+export interface LengthObservation {
+  length: number;
+  exact: boolean;
+}
+
 export interface BranchRecord {
   branchId: string;
   splitId: string;
@@ -89,6 +102,8 @@ export interface BranchRecord {
   locusPatternKey: Record<string, string>;
   /** Sorted by (conflictShare + missingShare) desc, top entries only. */
   taxonInstability: TaxonInstabilityEntry[];
+  /** The raw readings behind this branch's averaged length - see LengthObservation. */
+  lengthObservations: LengthObservation[];
 }
 
 /**

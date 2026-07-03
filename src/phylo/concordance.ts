@@ -420,6 +420,7 @@ export function computeBranchRecords(
           topologyPatterns,
           locusPatternKey,
           taxonInstability,
+          lengthObservations: [],
         };
         branches.set(splitId, record);
       }

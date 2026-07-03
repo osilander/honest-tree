@@ -287,6 +287,40 @@ body {
   margin-bottom: 2px;
 }
 
+.tooltip-subhead {
+  margin-top: 6px;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #94a3b8;
+}
+
+.length-histogram {
+  margin-top: 2px;
+}
+
+.length-histogram-legend {
+  display: flex;
+  gap: 10px;
+  margin-top: 2px;
+  font-size: 10px;
+  color: #cbd5e1;
+}
+
+.length-histogram-legend .legend-swatch {
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  display: inline-block;
+  margin-right: 3px;
+}
+
+.length-histogram-range {
+  font-size: 9px;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+
 .evidence-panel-container {
   overflow-y: auto;
   background: #fff;
