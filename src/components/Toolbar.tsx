@@ -1,0 +1,307 @@
+import type { AppState, RenderMode, SupportMetricKey } from '../types';
+import type { Action } from '../state/store';
+import type { Dispatch } from 'react';
+
+const RENDER_MODES: { value: RenderMode; label: string; title: string }[] = [
+  { value: 'support', label: 'Support', title: 'Width = support metric value. Color neutral - "how strongly is the reference topology supported".' },
+  { value: 'conflict', label: 'Conflict', title: 'Width = amount of discordance, color = kind of conflict (concentrated/contradicted/diffuse) - "what is wrong, and how".' },
+  {
+    value: 'evidence',
+    label: 'Evidence',
+    title: 'Width and color (blue = mostly decisive, yellow = mostly uninformative/missing, grey = almost no usable data) track decisiveness - "how much usable data exists", independent of what it says.',
+  },
+];
+
+const SUPPORT_METRICS: { value: SupportMetricKey; label: string }[] = [
+  { value: 'gcf', label: 'gCF (simplified)' },
+  { value: 'bootstrap', label: 'Bootstrap' },
+  { value: 'posterior', label: 'Posterior' },
+];
+
+const LOCUS_TRACK_POINT_OPTIONS: { value: string; label: string }[] = [
+  { value: 'all', label: 'All loci' },
+  { value: '500', label: '500 sampled loci' },
+  { value: '1000', label: '1000 sampled loci' },
+  { value: '2000', label: '2000 sampled loci' },
+];
+
+export function Toolbar({
+  appState,
+  dispatch,
+  onResetView,
+  onDownloadSvg,
+  onPrint,
+  taxa,
+}: {
+  appState: AppState;
+  dispatch: Dispatch<Action>;
+  onResetView: () => void;
+  onDownloadSvg: () => void;
+  onPrint: () => void;
+  taxa: string[];
+}) {
+  return (
+    <div className="toolbar">
+      <div className="toolbar-group">
+        <span className="toolbar-label">Search taxon</span>
+        <input
+          type="text"
+          list="taxa-datalist"
+          className="search-input"
+          placeholder="e.g. Taxon_16"
+          value={appState.searchTaxon ?? ''}
+          onChange={(e) => dispatch({ type: 'SET_SEARCH_TAXON', taxon: e.target.value || null })}
+        />
+        <datalist id="taxa-datalist">
+          {taxa.map((t) => (
+            <option key={t} value={t} />
+          ))}
+        </datalist>
+      </div>
+
+      <div className="toolbar-group">
+        <span className="toolbar-label">Render mode</span>
+        <div className="radio-row">
+          {RENDER_MODES.map((m) => (
+            <label key={m.value} className="radio-option" title={m.title}>
+              <input
+                type="radio"
+                name="renderMode"
+                checked={appState.renderMode === m.value}
+                onChange={() => dispatch({ type: 'SET_RENDER_MODE', mode: m.value })}
+              />
+              {m.label}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div className="toolbar-group">
+        <span className="toolbar-label">Support metric</span>
+        <select
+          value={appState.supportMetric}
+          onChange={(e) => dispatch({ type: 'SET_SUPPORT_METRIC', metric: e.target.value as SupportMetricKey })}
+        >
+          {SUPPORT_METRICS.map((m) => (
+            <option key={m.value} value={m.value}>
+              {m.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="toolbar-group">
+        <span className="toolbar-label">
+          Collapse below: {appState.threshold}%
+        </span>
+        <input
+          type="range"
+          min={0}
+          max={100}
+          value={appState.threshold}
+          onChange={(e) => dispatch({ type: 'SET_THRESHOLD', value: Number(e.target.value) })}
+        />
+        <label className="checkbox-option">
+          <input type="checkbox" checked={appState.collapseWeakBranches} onChange={() => dispatch({ type: 'TOGGLE_COLLAPSE' })} />
+          Collapse weak branches
+        </label>
+      </div>
+
+      <div className="toolbar-group">
+        <span className="toolbar-label">Text size: {appState.tipLabelSize}px</span>
+        <input
+          type="range"
+          min={7}
+          max={20}
+          value={appState.tipLabelSize}
+          onChange={(e) => dispatch({ type: 'SET_TIP_LABEL_SIZE', value: Number(e.target.value) })}
+        />
+      </div>
+
+      <div className="toolbar-group">
+        <span className="toolbar-label">Line thickness: {appState.branchWidthScale.toFixed(1)}x</span>
+        <input
+          type="range"
+          min={0.3}
+          max={3}
+          step={0.1}
+          value={appState.branchWidthScale}
+          onChange={(e) => dispatch({ type: 'SET_BRANCH_WIDTH_SCALE', value: Number(e.target.value) })}
+        />
+      </div>
+
+      <div className="toolbar-group toolbar-checks">
+        <label className="checkbox-option">
+          <input type="checkbox" checked={appState.showTipLabels} onChange={() => dispatch({ type: 'TOGGLE_TIP_LABELS' })} />
+          Tip labels
+        </label>
+        <label className="checkbox-option">
+          <input type="checkbox" checked={appState.useBranchLengths} onChange={() => dispatch({ type: 'TOGGLE_BRANCH_LENGTHS' })} />
+          Branch lengths
+        </label>
+        <label className="checkbox-option">
+          <input
+            type="checkbox"
+            checked={appState.showSupportValues}
+            onChange={() => dispatch({ type: 'TOGGLE_SUPPORT_VALUES' })}
+          />
+          Support values at nodes
+        </label>
+        <label className="checkbox-option">
+          <input
+            type="checkbox"
+            checked={appState.showConcordanceSummary}
+            onChange={() => dispatch({ type: 'TOGGLE_CONCORDANCE_SUMMARY' })}
+          />
+          Concordance summary (all branches)
+        </label>
+        <button className="reset-view-btn" onClick={onDownloadSvg}>
+          Download SVG
+        </button>
+        <button className="reset-view-btn" onClick={onPrint}>
+          Print / Save as PDF
+        </button>
+        <button className="reset-view-btn" onClick={onResetView}>
+          Reset view
+        </button>
+      </div>
+
+      <div className="toolbar-group">
+        <span className="toolbar-label">Locus topology track</span>
+        <div className="radio-row">
+          <label className="radio-option">
+            <input
+              type="radio"
+              name="locusTrackMode"
+              checked={appState.locusTrackMode === 'off'}
+              onChange={() => dispatch({ type: 'SET_LOCUS_TRACK_MODE', mode: 'off' })}
+            />
+            Off
+          </label>
+          <label className="radio-option">
+            <input
+              type="radio"
+              name="locusTrackMode"
+              checked={appState.locusTrackMode === 'chrom'}
+              onChange={() => dispatch({ type: 'SET_LOCUS_TRACK_MODE', mode: 'chrom' })}
+            />
+            Chromosome order
+          </label>
+          <label className="radio-option">
+            <input
+              type="radio"
+              name="locusTrackMode"
+              checked={appState.locusTrackMode === 'sorted'}
+              onChange={() => dispatch({ type: 'SET_LOCUS_TRACK_MODE', mode: 'sorted' })}
+            />
+            Sorted by rank
+          </label>
+        </div>
+      </div>
+
+      <div className="toolbar-group">
+        <span className="toolbar-label">Branch topology track</span>
+        <div className="radio-row">
+          <label className="radio-option">
+            <input
+              type="radio"
+              name="branchLocusTrackEnabled"
+              checked={appState.branchLocusTrackEnabled}
+              onChange={() => dispatch({ type: 'SET_BRANCH_LOCUS_TRACK_ENABLED', value: true })}
+            />
+            On
+          </label>
+          <label className="radio-option">
+            <input
+              type="radio"
+              name="branchLocusTrackEnabled"
+              checked={!appState.branchLocusTrackEnabled}
+              onChange={() => dispatch({ type: 'SET_BRANCH_LOCUS_TRACK_ENABLED', value: false })}
+            />
+            Off
+          </label>
+        </div>
+      </div>
+
+      {appState.locusTrackMode !== 'off' && (
+        <div className="toolbar-group">
+          <span className="toolbar-label">Track resolution</span>
+          <select
+            value={appState.locusTrackMaxPoints === null ? 'all' : String(appState.locusTrackMaxPoints)}
+            onChange={(e) =>
+              dispatch({ type: 'SET_LOCUS_TRACK_MAX_POINTS', value: e.target.value === 'all' ? null : Number(e.target.value) })
+            }
+          >
+            {LOCUS_TRACK_POINT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      <div className="toolbar-group">
+        <span className="toolbar-label">Taxon sampler</span>
+        <div className="radio-row">
+          <label className="radio-option">
+            <input
+              type="radio"
+              name="taxonSampleMode"
+              checked={appState.taxonSampleMode === 'off'}
+              onChange={() => dispatch({ type: 'SET_TAXON_SAMPLE_MODE', mode: 'off' })}
+            />
+            All taxa
+          </label>
+          <label className="radio-option" title="Draw an unbiased random subset - a sanity check against the 'most diverged' selection.">
+            <input
+              type="radio"
+              name="taxonSampleMode"
+              checked={appState.taxonSampleMode === 'random'}
+              onChange={() => dispatch({ type: 'SET_TAXON_SAMPLE_MODE', mode: 'random' })}
+            />
+            Random
+          </label>
+          <label
+            className="radio-option"
+            title="Keep the taxa on the longest terminal branches - the most phylogenetically distinct - and drop short, near-duplicate branches first."
+          >
+            <input
+              type="radio"
+              name="taxonSampleMode"
+              checked={appState.taxonSampleMode === 'diverged'}
+              onChange={() => dispatch({ type: 'SET_TAXON_SAMPLE_MODE', mode: 'diverged' })}
+            />
+            Most diverged
+          </label>
+        </div>
+      </div>
+
+      {appState.taxonSampleMode !== 'off' && (
+        <div className="toolbar-group">
+          <span className="toolbar-label">Taxa to show</span>
+          <div className="radio-row">
+            <input
+              type="number"
+              className="taxon-count-input"
+              min={2}
+              max={taxa.length}
+              value={appState.taxonSampleCount}
+              onChange={(e) =>
+                dispatch({
+                  type: 'SET_TAXON_SAMPLE_COUNT',
+                  value: Math.max(2, Math.min(taxa.length, Number(e.target.value) || 2)),
+                })
+              }
+            />
+            {appState.taxonSampleMode === 'random' && (
+              <button className="reset-view-btn" onClick={() => dispatch({ type: 'RESAMPLE_TAXA' })}>
+                Resample
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

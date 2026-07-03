@@ -1,0 +1,127 @@
+import { createContext, useContext, useReducer, type Dispatch, type ReactNode } from 'react';
+import type { AppState, Dataset, RenderMode, SupportMetricKey } from '../types';
+
+export interface StoreState {
+  dataset: Dataset | null;
+  loadError: string | null;
+  app: AppState;
+}
+
+const initialAppState: AppState = {
+  selectedBranchId: null,
+  hoveredBranchId: null,
+  renderMode: 'conflict',
+  supportMetric: 'gcf',
+  threshold: 50,
+  collapseWeakBranches: false,
+  showTipLabels: true,
+  useBranchLengths: true,
+  showConcordanceSummary: false,
+  matrixVisible: false,
+  barcodeSort: 'input_order',
+  tipLabelSize: 11,
+  branchWidthScale: 1,
+  showSupportValues: false,
+  locusTrackMode: 'chrom',
+  locusTrackMaxPoints: null,
+  branchLocusTrackEnabled: true,
+  taxonSampleMode: 'off',
+  taxonSampleCount: 15,
+  taxonSampleSeed: 0,
+  searchTaxon: null,
+  missingBreakdownOpen: false,
+};
+
+const initialState: StoreState = {
+  dataset: null,
+  loadError: null,
+  app: initialAppState,
+};
+
+export type Action =
+  | { type: 'LOAD_DATASET'; dataset: Dataset }
+  | { type: 'LOAD_ERROR'; message: string }
+  | { type: 'SELECT_BRANCH'; branchId: string | null }
+  | { type: 'HOVER_BRANCH'; branchId: string | null }
+  | { type: 'SET_RENDER_MODE'; mode: RenderMode }
+  | { type: 'SET_SUPPORT_METRIC'; metric: SupportMetricKey }
+  | { type: 'SET_THRESHOLD'; value: number }
+  | { type: 'TOGGLE_COLLAPSE' }
+  | { type: 'TOGGLE_TIP_LABELS' }
+  | { type: 'TOGGLE_BRANCH_LENGTHS' }
+  | { type: 'TOGGLE_CONCORDANCE_SUMMARY' }
+  | { type: 'SET_TIP_LABEL_SIZE'; value: number }
+  | { type: 'SET_BRANCH_WIDTH_SCALE'; value: number }
+  | { type: 'TOGGLE_SUPPORT_VALUES' }
+  | { type: 'SET_LOCUS_TRACK_MODE'; mode: 'off' | 'chrom' | 'sorted' }
+  | { type: 'SET_LOCUS_TRACK_MAX_POINTS'; value: number | null }
+  | { type: 'SET_BRANCH_LOCUS_TRACK_ENABLED'; value: boolean }
+  | { type: 'SET_TAXON_SAMPLE_MODE'; mode: 'off' | 'random' | 'diverged' }
+  | { type: 'SET_TAXON_SAMPLE_COUNT'; value: number }
+  | { type: 'RESAMPLE_TAXA' }
+  | { type: 'SET_SEARCH_TAXON'; taxon: string | null }
+  | { type: 'TOGGLE_MISSING_BREAKDOWN' };
+
+function reducer(state: StoreState, action: Action): StoreState {
+  switch (action.type) {
+    case 'LOAD_DATASET':
+      return { ...state, dataset: action.dataset, loadError: null, app: { ...initialAppState } };
+    case 'LOAD_ERROR':
+      return { ...state, loadError: action.message };
+    case 'SELECT_BRANCH':
+      return { ...state, app: { ...state.app, selectedBranchId: action.branchId, missingBreakdownOpen: false } };
+    case 'HOVER_BRANCH':
+      return { ...state, app: { ...state.app, hoveredBranchId: action.branchId } };
+    case 'SET_RENDER_MODE':
+      return { ...state, app: { ...state.app, renderMode: action.mode } };
+    case 'SET_SUPPORT_METRIC':
+      return { ...state, app: { ...state.app, supportMetric: action.metric } };
+    case 'SET_THRESHOLD':
+      return { ...state, app: { ...state.app, threshold: action.value } };
+    case 'TOGGLE_COLLAPSE':
+      return { ...state, app: { ...state.app, collapseWeakBranches: !state.app.collapseWeakBranches } };
+    case 'TOGGLE_TIP_LABELS':
+      return { ...state, app: { ...state.app, showTipLabels: !state.app.showTipLabels } };
+    case 'TOGGLE_BRANCH_LENGTHS':
+      return { ...state, app: { ...state.app, useBranchLengths: !state.app.useBranchLengths } };
+    case 'TOGGLE_CONCORDANCE_SUMMARY':
+      return { ...state, app: { ...state.app, showConcordanceSummary: !state.app.showConcordanceSummary } };
+    case 'SET_TIP_LABEL_SIZE':
+      return { ...state, app: { ...state.app, tipLabelSize: action.value } };
+    case 'SET_BRANCH_WIDTH_SCALE':
+      return { ...state, app: { ...state.app, branchWidthScale: action.value } };
+    case 'TOGGLE_SUPPORT_VALUES':
+      return { ...state, app: { ...state.app, showSupportValues: !state.app.showSupportValues } };
+    case 'SET_LOCUS_TRACK_MODE':
+      return { ...state, app: { ...state.app, locusTrackMode: action.mode } };
+    case 'SET_LOCUS_TRACK_MAX_POINTS':
+      return { ...state, app: { ...state.app, locusTrackMaxPoints: action.value } };
+    case 'SET_BRANCH_LOCUS_TRACK_ENABLED':
+      return { ...state, app: { ...state.app, branchLocusTrackEnabled: action.value } };
+    case 'SET_TAXON_SAMPLE_MODE':
+      return { ...state, app: { ...state.app, taxonSampleMode: action.mode } };
+    case 'SET_TAXON_SAMPLE_COUNT':
+      return { ...state, app: { ...state.app, taxonSampleCount: action.value } };
+    case 'RESAMPLE_TAXA':
+      return { ...state, app: { ...state.app, taxonSampleSeed: state.app.taxonSampleSeed + 1 } };
+    case 'SET_SEARCH_TAXON':
+      return { ...state, app: { ...state.app, searchTaxon: action.taxon } };
+    case 'TOGGLE_MISSING_BREAKDOWN':
+      return { ...state, app: { ...state.app, missingBreakdownOpen: !state.app.missingBreakdownOpen } };
+    default:
+      return state;
+  }
+}
+
+const StoreContext = createContext<{ state: StoreState; dispatch: Dispatch<Action> } | null>(null);
+
+export function StoreProvider({ children }: { children: ReactNode }) {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  return <StoreContext.Provider value={{ state, dispatch }}>{children}</StoreContext.Provider>;
+}
+
+export function useStore() {
+  const ctx = useContext(StoreContext);
+  if (!ctx) throw new Error('useStore must be used within StoreProvider');
+  return ctx;
+}
