@@ -126,6 +126,58 @@ body {
   gap: 14px;
 }
 
+.toolbar-actions {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-dropdown {
+  position: relative;
+}
+
+.toolbar-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+  cursor: pointer;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.toolbar-dropdown-btn:hover,
+.toolbar-dropdown-btn.open {
+  background: #e0e7ff;
+  border-color: #a5b4fc;
+}
+
+.toolbar-dropdown-caret {
+  font-size: 9px;
+  color: #64748b;
+}
+
+.toolbar-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 50;
+  min-width: 220px;
+  max-width: min(90vw, 320px);
+}
+
 .reset-view-btn {
   font-size: 12px;
   padding: 4px 10px;
