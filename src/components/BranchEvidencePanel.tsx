@@ -4,11 +4,6 @@ import { generateNaturalLanguageReport } from '../report/naturalLanguage';
 import { patternLabel, withAltRanks } from '../utils/pattern';
 import { EdgeHistogram } from './EdgeHistogram';
 
-function taxaList(taxa: string[], max = 8): string {
-  if (taxa.length <= max) return taxa.join(', ');
-  return `${taxa.slice(0, max).join(', ')}, +${taxa.length - max} more`;
-}
-
 function describeInstability(entry: TaxonInstabilityEntry): string {
   if (entry.missingShare >= 0.5 && entry.missingShare > entry.conflictShare) {
     return `mostly missing (${(entry.missingShare * 100).toFixed(0)}% of loci)`;
@@ -41,9 +36,6 @@ function buildCopyText(branch: BranchRecord): string {
     '',
     'Most unstable taxa:',
     ...branch.taxonInstability.slice(0, 5).map((t) => `  ${t.taxon}: ${describeInstability(t)}`),
-    '',
-    `Side A (${branch.taxaLeft.length}): ${branch.taxaLeft.join(', ')}`,
-    `Side B (${branch.taxaRight.length}): ${branch.taxaRight.join(', ')}`,
   ];
   return lines.join('\n');
 }
@@ -180,16 +172,6 @@ export function BranchEvidencePanel({
             ))}
           </ul>
         )}
-      </section>
-
-      <section>
-        <h4>Taxa</h4>
-        <p className="taxa-side">
-          <strong>Side A</strong> ({branch.taxaLeft.length}): {taxaList(branch.taxaLeft)}
-        </p>
-        <p className="taxa-side">
-          <strong>Side B</strong> ({branch.taxaRight.length}): {taxaList(branch.taxaRight)}
-        </p>
       </section>
 
       <section>

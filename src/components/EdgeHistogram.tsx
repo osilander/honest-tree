@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { BranchRecord } from '../types';
 import { MISSING_COLOR } from '../utils/color';
-import { patternColor, patternLabel, withAltRanks } from '../utils/pattern';
+import { patternColor, patternLabel, patternTag, withAltRanks } from '../utils/pattern';
 import { LocalSplitTreePair } from './LocalSplitTreePair';
 
 export function EdgeHistogram({ branch }: { branch: BranchRecord }) {
@@ -36,10 +36,10 @@ export function EdgeHistogram({ branch }: { branch: BranchRecord }) {
           ({ pattern, altRank }) =>
             pattern.count > 0 && (
               <div key={pattern.key}>
-                <div className="histogram-legend-row">
+                <div className="histogram-legend-row" title={patternLabel(branch, pattern, altRank)}>
                   <span className="legend-swatch" style={{ background: patternColor(pattern, altRank) }} />
                   <span className="legend-pct">{((pattern.count / total) * 100).toFixed(0)}%</span>
-                  <span className="legend-desc">{patternLabel(branch, pattern, altRank)}</span>
+                  <span className="legend-desc">{patternTag(pattern, altRank)}</span>
                   <span className="legend-count">({pattern.count})</span>
                 </div>
                 {pattern.refLocalTree && pattern.altLocalTree && (
