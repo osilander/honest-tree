@@ -4,6 +4,7 @@ import type { AppState, Dataset, RenderMode, SupportMetricKey } from '../types';
 export interface StoreState {
   dataset: Dataset | null;
   loadError: string | null;
+  loading: boolean;
   app: AppState;
 }
 
@@ -28,6 +29,7 @@ const initialAppState: AppState = {
   taxonSampleMode: 'off',
   taxonSampleCount: 15,
   taxonSampleSeed: 0,
+  rerootSplitId: null,
   searchTaxon: null,
   missingBreakdownOpen: false,
 };
@@ -35,10 +37,12 @@ const initialAppState: AppState = {
 const initialState: StoreState = {
   dataset: null,
   loadError: null,
+  loading: false,
   app: initialAppState,
 };
 
 export type Action =
+  | { type: 'LOAD_START' }
   | { type: 'LOAD_DATASET'; dataset: Dataset }
   | { type: 'LOAD_ERROR'; message: string }
   | { type: 'SELECT_BRANCH'; branchId: string | null }
@@ -60,14 +64,17 @@ export type Action =
   | { type: 'SET_TAXON_SAMPLE_COUNT'; value: number }
   | { type: 'RESAMPLE_TAXA' }
   | { type: 'SET_SEARCH_TAXON'; taxon: string | null }
-  | { type: 'TOGGLE_MISSING_BREAKDOWN' };
+  | { type: 'TOGGLE_MISSING_BREAKDOWN' }
+  | { type: 'SET_REROOT_SPLIT'; splitId: string | null };
 
 function reducer(state: StoreState, action: Action): StoreState {
   switch (action.type) {
+    case 'LOAD_START':
+      return { ...state, loading: true, loadError: null };
     case 'LOAD_DATASET':
-      return { ...state, dataset: action.dataset, loadError: null, app: { ...initialAppState } };
+      return { ...state, dataset: action.dataset, loadError: null, loading: false, app: { ...initialAppState } };
     case 'LOAD_ERROR':
-      return { ...state, loadError: action.message };
+      return { ...state, loadError: action.message, loading: false };
     case 'SELECT_BRANCH':
       return { ...state, app: { ...state.app, selectedBranchId: action.branchId, missingBreakdownOpen: false } };
     case 'HOVER_BRANCH':
@@ -108,6 +115,8 @@ function reducer(state: StoreState, action: Action): StoreState {
       return { ...state, app: { ...state.app, searchTaxon: action.taxon } };
     case 'TOGGLE_MISSING_BREAKDOWN':
       return { ...state, app: { ...state.app, missingBreakdownOpen: !state.app.missingBreakdownOpen } };
+    case 'SET_REROOT_SPLIT':
+      return { ...state, app: { ...state.app, rerootSplitId: action.splitId } };
     default:
       return state;
   }

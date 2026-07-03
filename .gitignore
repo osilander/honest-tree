@@ -12,9 +12,11 @@ dist
 dist-ssr
 *.local
 
-# Local test/scratch data - large and may contain unpublished research data;
-# the small curated samples the app itself loads live in public/sample-data.
-/testdata/
+# Individual test data files over 2MB - kept out of the repo, everything else
+# in testdata/ (the 14k+ small per-exon/intron trees, smaller sample datasets)
+# is tracked normally.
+/testdata/bird_exons_combined.nwk
+/testdata/bird_exons_combined_with_chrom.nex
 
 # Editor directories and files
 .vscode/*

@@ -7,6 +7,7 @@ import { BranchEvidencePanel } from './components/BranchEvidencePanel';
 import { LocusTopologyTrack } from './components/LocusTopologyTrack';
 import { BranchLocusTrack } from './components/BranchLocusTrack';
 import { TaxonSummaryPanel } from './components/TaxonSummaryPanel';
+import { LoadingOverlay } from './components/LoadingOverlay';
 
 function App() {
   const { state, dispatch } = useStore();
@@ -81,6 +82,9 @@ function App() {
               branch={selectedBranch}
               missingBreakdownOpen={state.app.missingBreakdownOpen}
               onToggleMissingBreakdown={() => dispatch({ type: 'TOGGLE_MISSING_BREAKDOWN' })}
+              isRerootedHere={!!selectedBranch && state.app.rerootSplitId === selectedBranch.splitId}
+              onRerootHere={() => selectedBranch && dispatch({ type: 'SET_REROOT_SPLIT', splitId: selectedBranch.splitId })}
+              onResetRoot={() => dispatch({ type: 'SET_REROOT_SPLIT', splitId: null })}
             />
           )}
         </div>
@@ -103,6 +107,7 @@ function App() {
       )}
 
       <Dropzone hasDataset={!!state.dataset} dispatch={dispatch} />
+      {state.loading && <LoadingOverlay />}
     </div>
   );
 }

@@ -61,10 +61,16 @@ export function BranchEvidencePanel({
   branch,
   missingBreakdownOpen,
   onToggleMissingBreakdown,
+  isRerootedHere,
+  onRerootHere,
+  onResetRoot,
 }: {
   branch: BranchRecord | null;
   missingBreakdownOpen: boolean;
   onToggleMissingBreakdown: () => void;
+  isRerootedHere: boolean;
+  onRerootHere: () => void;
+  onResetRoot: () => void;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -88,16 +94,27 @@ export function BranchEvidencePanel({
       <section>
         <div className="section-header-row">
           <h4>Report</h4>
-          <button
-            className="copy-report-btn"
-            onClick={() => {
-              navigator.clipboard.writeText(buildCopyText(branch));
-              setCopied(true);
-              setTimeout(() => setCopied(false), 1500);
-            }}
-          >
-            {copied ? 'Copied!' : 'Copy branch report'}
-          </button>
+          <div className="header-btn-row">
+            {isRerootedHere ? (
+              <button className="copy-report-btn" onClick={onResetRoot}>
+                Reset root
+              </button>
+            ) : (
+              <button className="copy-report-btn" onClick={onRerootHere}>
+                Re-root here
+              </button>
+            )}
+            <button
+              className="copy-report-btn"
+              onClick={() => {
+                navigator.clipboard.writeText(buildCopyText(branch));
+                setCopied(true);
+                setTimeout(() => setCopied(false), 1500);
+              }}
+            >
+              {copied ? 'Copied!' : 'Copy branch report'}
+            </button>
+          </div>
         </div>
         <p className="nl-report">{generateNaturalLanguageReport(branch)}</p>
       </section>

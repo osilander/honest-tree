@@ -16,12 +16,21 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
 
   const loadFromText = useCallback(
     (text: string, name: string) => {
-      try {
-        const dataset = loadDatasetFromText(text, name);
-        dispatch({ type: 'LOAD_DATASET', dataset });
-      } catch (e) {
-        dispatch({ type: 'LOAD_ERROR', message: (e as Error).message });
-      }
+      dispatch({ type: 'LOAD_START' });
+      // loadDatasetFromText is synchronous and can block the main thread for
+      // 20-30s+ on large datasets - defer it two animation frames so the
+      // "loading" state we just dispatched actually gets painted first,
+      // rather than the browser freezing before ever showing it.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          try {
+            const dataset = loadDatasetFromText(text, name);
+            dispatch({ type: 'LOAD_DATASET', dataset });
+          } catch (e) {
+            dispatch({ type: 'LOAD_ERROR', message: (e as Error).message });
+          }
+        });
+      });
     },
     [dispatch],
   );

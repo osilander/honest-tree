@@ -155,6 +155,7 @@ export interface AppState {
   taxonSampleMode: 'off' | 'random' | 'diverged';
   taxonSampleCount: number;
   taxonSampleSeed: number;
+  rerootSplitId: string | null;
   searchTaxon: string | null;
   missingBreakdownOpen: boolean;
 }

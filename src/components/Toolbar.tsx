@@ -164,6 +164,11 @@ export function Toolbar({
         <button className="reset-view-btn" onClick={onResetView}>
           Reset view
         </button>
+        {appState.rerootSplitId && (
+          <button className="reset-view-btn" onClick={() => dispatch({ type: 'SET_REROOT_SPLIT', splitId: null })} title="Rerooted at a branch - click to restore the original rooting">
+            Rerooted — reset root
+          </button>
+        )}
       </div>
 
       <div className="toolbar-group">

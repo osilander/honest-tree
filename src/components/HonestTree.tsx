@@ -4,6 +4,7 @@ import type { AppState, BranchRecord, Dataset, LayoutNode } from '../types';
 import { computeLayout, collectEdges, collectNodes } from '../phylo/layout';
 import { collapseWeakBranches } from '../phylo/collapse';
 import { pickSampledTaxa, pruneTaxaForDisplay } from '../phylo/taxonSample';
+import { findNodeForSplit, rerootAtNode } from '../phylo/reroot';
 import { getSupportMetricValue } from '../phylo/metrics';
 import { encodeBranch } from '../utils/encode';
 import { normalizeTaxonQuery } from '../utils/search';
@@ -63,10 +64,21 @@ export const HonestTree = forwardRef<HonestTreeHandle, HonestTreeProps>(function
     return () => observer.disconnect();
   }, []);
 
+  // Re-rooting doesn't change which bipartitions exist (a split's canonical
+  // id is always min(mask, complement), independent of root placement), so
+  // it can happen first and everything downstream (weak-branch collapsing,
+  // taxon sampling, layout) keeps matching branches correctly with no
+  // special-casing needed.
+  const rerootedRoot = useMemo(() => {
+    if (!appState.rerootSplitId) return dataset.referenceTree;
+    const target = findNodeForSplit(dataset.referenceTree, dataset.taxonIndex, appState.rerootSplitId);
+    return target ? rerootAtNode(dataset.referenceTree, target) : dataset.referenceTree;
+  }, [dataset, appState.rerootSplitId]);
+
   const effectiveRoot = useMemo(() => {
-    if (!appState.collapseWeakBranches) return dataset.referenceTree;
-    return collapseWeakBranches(dataset.referenceTree, dataset.branches, dataset.taxonIndex, appState.supportMetric, appState.threshold);
-  }, [dataset, appState.collapseWeakBranches, appState.supportMetric, appState.threshold]);
+    if (!appState.collapseWeakBranches) return rerootedRoot;
+    return collapseWeakBranches(rerootedRoot, dataset.branches, dataset.taxonIndex, appState.supportMetric, appState.threshold);
+  }, [rerootedRoot, dataset, appState.collapseWeakBranches, appState.supportMetric, appState.threshold]);
 
   const sampledTaxa = useMemo(
     () => pickSampledTaxa(dataset, appState.taxonSampleMode, appState.taxonSampleCount),
