@@ -1,7 +1,7 @@
 import type { BranchRecord, Dataset } from '../types';
 import { MISSING_COLOR, OTHER_COLOR } from '../utils/color';
 import { orderedLoci, subsample } from '../utils/locusOrder';
-import { patternColor, patternLabel, withAltRanks } from '../utils/pattern';
+import { patternColor, patternLabel, patternTag, withAltRanks } from '../utils/pattern';
 
 interface BranchLocusTrackProps {
   dataset: Dataset;
@@ -57,9 +57,9 @@ export function BranchLocusTrack({ dataset, branch, mode, maxPoints }: BranchLoc
         {ranked.map(
           ({ pattern, altRank }) =>
             pattern.count > 0 && (
-              <span key={pattern.key} className="legend-item">
+              <span key={pattern.key} className="legend-item" title={patternLabel(branch, pattern, altRank)}>
                 <span className="legend-swatch" style={{ background: patternColor(pattern, altRank) }} />
-                {patternLabel(branch, pattern, altRank)}: {pattern.count}
+                {patternTag(pattern, altRank)}: {pattern.count}
               </span>
             ),
         )}
