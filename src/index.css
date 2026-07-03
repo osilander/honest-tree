@@ -108,7 +108,8 @@ body {
 
 .radio-row {
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 6px 10px;
 }
 
 .radio-option,
@@ -121,9 +122,7 @@ body {
 }
 
 .toolbar-checks {
-  flex-direction: row;
-  align-items: center;
-  gap: 14px;
+  gap: 8px;
 }
 
 .toolbar-actions {
