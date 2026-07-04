@@ -3,9 +3,10 @@ import { loadDatasetFromText } from '../data/loadDataset';
 import type { Action } from '../state/store';
 
 const SAMPLE_DATASETS: { file: string; label: string }[] = [
-  { file: 'example_30taxa_500trees_variable_lengths.nwk', label: 'Real example — 30 taxa, 500 loci' },
-  { file: 'dataset_diverse_30taxa_1000trees.nwk', label: 'Synthetic, diverse conflict — 30 taxa, 1000 loci' },
-  { file: 'dataset_chromosome_30taxa_1000trees.nwk', label: 'Synthetic, chromosome-ordered — 30 taxa, 1000 loci' },
+  { file: 'synthetic_25taxa_500loci.nwk', label: 'Synthetic — 25 taxa, 500 loci' },
+  { file: 'synthetic_25taxa_5000loci.nwk', label: 'Synthetic — 25 taxa, 5000 loci' },
+  { file: 'synthetic_50taxa_500loci.nwk', label: 'Synthetic — 50 taxa, 500 loci' },
+  { file: 'synthetic_50taxa_5000loci.nwk', label: 'Synthetic — 50 taxa, 5000 loci' },
 ];
 
 export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispatch: Dispatch<Action> }) {

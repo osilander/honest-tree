@@ -14,9 +14,12 @@ dist-ssr
 
 # Individual test data files over 2MB - kept out of the repo, everything else
 # in testdata/ (the 14k+ small per-exon/intron trees, smaller sample datasets)
-# is tracked normally.
+# is tracked normally. Note: the same content is tracked via public/sample-data/
+# regardless of size, since the deployed app needs to actually serve it.
 /testdata/bird_exons_combined.nwk
 /testdata/bird_exons_combined_with_chrom.nex
+/testdata/synthetic_25taxa_5000loci.nwk
+/testdata/synthetic_50taxa_5000loci.nwk
 
 # Editor directories and files
 .vscode/*
