@@ -21,9 +21,15 @@ function otherTail(b: BranchRecord) {
   return b.topologyPatterns.find((p) => p.isOther && p.count > 0) ?? null;
 }
 
-/** The single most common non-reference pattern, with its stable alt-rank (for "Alternative A/B/..." lettering). */
+/**
+ * The single most common non-reference *named* pattern, with its stable
+ * alt-rank (for "Alternative A/B/..." lettering). Must exclude isOther - it's
+ * a collapsed tail of many small, unrelated alternatives, not one specific
+ * topology, so it can out-count every real alternative just by being a sum
+ * of several without representing any single coherent disagreement.
+ */
 function topAlt(b: BranchRecord): { pattern: TopologyPattern; altRank: number } | null {
-  const ranked = withAltRanks(b.topologyPatterns).filter(({ pattern }) => !pattern.isMain && pattern.count > 0);
+  const ranked = withAltRanks(b.topologyPatterns).filter(({ pattern }) => !pattern.isMain && !pattern.isOther && pattern.count > 0);
   if (ranked.length === 0) return null;
   return ranked.reduce((best, cur) => (cur.pattern.count > best.pattern.count ? cur : best));
 }

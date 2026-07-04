@@ -401,7 +401,11 @@ export function computeBranchRecords(
           topologyPatterns.push({ key: 'other', isMain: false, isOther: true, extraTaxa: [], count: otherCount, altMovers: [] });
         }
 
-        const topAltCount = Math.max(0, ...topologyPatterns.filter((p) => !p.isMain).map((p) => p.count));
+        // Exclude isOther - it's a collapsed tail of many small alternatives, not
+        // one specific topology, so it can outweigh every real alternative just by
+        // being their sum without representing any single coherent disagreement
+        // (which would wrongly read as "concentrated" instead of "diffuse").
+        const topAltCount = Math.max(0, ...topologyPatterns.filter((p) => !p.isMain && !p.isOther).map((p) => p.count));
         const concordantProportion = decisiveLoci > 0 ? mainCount / decisiveLoci : 0;
 
         const record: BranchRecord = {
