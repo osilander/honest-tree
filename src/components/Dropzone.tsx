@@ -3,6 +3,7 @@ import { loadDatasetFromText } from '../data/loadDataset';
 import type { Action } from '../state/store';
 
 const SAMPLE_DATASETS: { file: string; label: string }[] = [
+  { file: 'mammal-sample-all-cds.nwk', label: 'Real — mammal CDS gene trees, 22 taxa, 1000 loci' },
   { file: 'synthetic_25taxa_500loci.nwk', label: 'Synthetic — 25 taxa, 500 loci' },
   { file: 'synthetic_25taxa_5000loci.nwk', label: 'Synthetic — 25 taxa, 5000 loci' },
   { file: 'synthetic_50taxa_500loci.nwk', label: 'Synthetic — 50 taxa, 500 loci' },
