@@ -22,7 +22,13 @@ gCF/bootstrap/posterior support viewer (yet). Specifically:
   order, kept whenever compatible with what's already accepted. This is a
   different kind of summary than a Bayesian posterior sample or a
   species-tree inference method, even though the tree looks similar in
-  shape.
+  shape. I.e., there is no population- or species-level model of *why*
+  gene trees disagree (such as incomplete lineage sorting) - it is a
+  frequency tally over the trees you gave it, not a coalescent-aware
+  estimate of the species tree. In particular, under high ILS the true
+  species tree can differ from the most frequent gene tree topology (the
+  "anomaly zone"); this consensus procedure cannot recover that case, by
+  construction.
 - **"Clade recovery" (the `Clade recovery` metric)**: the fraction of
   decisive input trees in which a branch's exact reference clade is
   recovered. This is clade/split recovery frequency, **not** the formal

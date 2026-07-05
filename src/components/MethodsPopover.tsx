@@ -21,7 +21,12 @@ export function MethodsPopover() {
             <div className="methods-popover-body">
               <dl>
                 <dt>Reference tree</dt>
-                <dd>Greedy compatible-splits consensus from your input gene trees - not a Bayesian posterior summary, not species-tree inference.</dd>
+                <dd>
+                  Greedy compatible-splits consensus from your input gene trees - not a Bayesian posterior summary, not species-tree inference.
+                  I.e. no population-/species-level model of <em>why</em> trees disagree (e.g. incomplete lineage sorting) - just a frequency
+                  tally, so it can't recover cases where the true species tree differs from the most common gene tree topology (the "anomaly
+                  zone").
+                </dd>
 
                 <dt>Clade recovery</dt>
                 <dd>% of decisive loci where this exact clade is recovered. Not the formal quartet-based gCF statistic.</dd>
