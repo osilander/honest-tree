@@ -71,3 +71,14 @@ The app's diagnostic value is in the second half of this list - local
 conflict patterns, taxon-movement diagnostics, and missing-vs-uninformative
 separation - not in presenting a single point-estimate tree as if every
 number on it were a formal, off-the-shelf phylogenetic statistic.
+
+## Sample data sources
+
+The mammal CDS gene-tree sample dataset is derived from:
+
+> Chen, M.-Y., Liang, D., & Zhang, P. (2017). Phylogenomic Resolution of the
+> Phylogeny of Laurasiatherian Mammals: Exploring Phylogenetic Signals within
+> Coding and Noncoding Sequences. *Genome Biology and Evolution*, 9(8),
+> 1998-2012.
+
+The synthetic datasets are simulated, not derived from any real study.
