@@ -1,9 +1,15 @@
 import { useCallback, useEffect, useRef, useState, type Dispatch } from 'react';
 import { loadDatasetFromText } from '../data/loadDataset';
+import { parseLocusMetadataTable } from '../data/parseLocusMetadata';
 import type { Action } from '../state/store';
 
-const SAMPLE_DATASETS: { file: string; label: string; refFile: string }[] = [
-  { file: 'mammal-sample-all-cds.nwk', label: 'Real — mammal CDS gene trees, 22 taxa, 1000 loci', refFile: 'mammal-sample-all-cds-reference.nwk' },
+const SAMPLE_DATASETS: { file: string; label: string; refFile: string; metadataFile?: string }[] = [
+  {
+    file: 'mammal-sample-all-cds.nex',
+    label: 'Real — mammal CDS gene trees, 22 taxa, 1000 loci',
+    refFile: 'mammal-sample-all-cds-reference.nwk',
+    metadataFile: 'mammal-cds-locus-metadata.tsv',
+  },
   { file: 'synthetic_25taxa_500loci.nwk', label: 'Synthetic — 25 taxa, 500 loci', refFile: 'synthetic_25taxa_500loci-reference.nwk' },
   { file: 'synthetic_25taxa_5000loci.nwk', label: 'Synthetic — 25 taxa, 5000 loci', refFile: 'synthetic_25taxa_5000loci-reference.nwk' },
   { file: 'synthetic_50taxa_500loci.nwk', label: 'Synthetic — 50 taxa, 500 loci', refFile: 'synthetic_50taxa_500loci-reference.nwk' },
@@ -16,6 +22,7 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
   const [sampleLoading, setSampleLoading] = useState(false);
   const [refTree, setRefTree] = useState<{ text: string; name: string } | null>(null);
   const [useSampleRef, setUseSampleRef] = useState(false);
+  const [useSampleMetadata, setUseSampleMetadata] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const refFileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -23,7 +30,7 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
     // refOverride === undefined means "use whatever's in the refTree state" (the
     // manually-uploaded file, if any); pass an explicit object/null to override
     // that for one call, e.g. when a sample's own prebuilt reference is used instead.
-    (text: string, name: string, refOverride?: { text: string; name: string } | null) => {
+    (text: string, name: string, refOverride?: { text: string; name: string } | null, metadataText?: string) => {
       const ref = refOverride !== undefined ? refOverride : refTree;
       dispatch({ type: 'LOAD_START' });
       // loadDatasetFromText is synchronous and can block the main thread for
@@ -35,6 +42,15 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
           try {
             const dataset = loadDatasetFromText(text, name, ref?.text, ref?.name);
             dispatch({ type: 'LOAD_DATASET', dataset });
+            if (metadataText) {
+              try {
+                const knownLoci = new Set(dataset.geneTrees.map((t) => t.name));
+                const { table } = parseLocusMetadataTable(metadataText, knownLoci);
+                dispatch({ type: 'SET_LOCUS_METADATA', table });
+              } catch (e) {
+                console.warn('Prebuilt sample metadata failed to parse:', (e as Error).message);
+              }
+            }
           } catch (e) {
             dispatch({ type: 'LOAD_ERROR', message: (e as Error).message });
           }
@@ -65,20 +81,28 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
       const text = await res.text();
 
       const sample = SAMPLE_DATASETS.find((s) => s.file === sampleChoice);
+
+      let metadataText: string | undefined;
+      if (useSampleMetadata && sample?.metadataFile) {
+        const metaRes = await fetch(`${import.meta.env.BASE_URL}sample-data/${sample.metadataFile}`);
+        if (!metaRes.ok) throw new Error(`Could not fetch sample metadata (${metaRes.status})`);
+        metadataText = await metaRes.text();
+      }
+
       if (useSampleRef && sample) {
         const refRes = await fetch(`${import.meta.env.BASE_URL}sample-data/${sample.refFile}`);
         if (!refRes.ok) throw new Error(`Could not fetch sample reference tree (${refRes.status})`);
         const refText = await refRes.text();
-        loadFromText(text, sampleChoice, { text: refText, name: sample.refFile });
+        loadFromText(text, sampleChoice, { text: refText, name: sample.refFile }, metadataText);
       } else {
-        loadFromText(text, sampleChoice);
+        loadFromText(text, sampleChoice, undefined, metadataText);
       }
     } catch (e) {
       dispatch({ type: 'LOAD_ERROR', message: (e as Error).message });
     } finally {
       setSampleLoading(false);
     }
-  }, [sampleChoice, useSampleRef, loadFromText, dispatch]);
+  }, [sampleChoice, useSampleRef, useSampleMetadata, loadFromText, dispatch]);
 
   useEffect(() => {
     function onDragOver(e: DragEvent) {
@@ -140,6 +164,13 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
               Use its prebuilt reference tree instead of the default consensus (built from a random half of its gene
               trees - an independent, but not "true", reconstruction)
             </label>
+            {SAMPLE_DATASETS.find((s) => s.file === sampleChoice)?.metadataFile && (
+              <label className="dropzone-sample-refcheck">
+                <input type="checkbox" checked={useSampleMetadata} onChange={(e) => setUseSampleMetadata(e.target.checked)} />
+                Also load its prebuilt per-locus metadata (alignment length, GC%, informative sites, subset bucket
+                membership from the source paper)
+              </label>
+            )}
           </div>
           <div className="dropzone-reftree">
             <p className="dropzone-hint">
