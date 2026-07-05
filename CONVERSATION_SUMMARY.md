@@ -132,3 +132,54 @@ things were requested and built.
 
 - Asked for this file: a chronological, non-exhaustive summary of the
   prompts/requests across the whole conversation.
+
+## 11. Reference-tree wording, glossary follow-through, and a "bring your own" feature
+
+- Asked to clarify, in both the README and the Methods popover, exactly what
+  "not species-tree inference" means for the built-in consensus tree - added
+  language naming the specific mechanism (no population-/species-level model
+  of *why* gene trees disagree, e.g. incomplete lineage sorting) and the
+  concrete consequence (can't recover "anomaly zone" branches where the true
+  species tree differs from the most common gene tree topology).
+- Asked whether it would be easier to let users supply an externally-inferred
+  reference tree (e.g. from ASTRAL or StarBEAST2) instead of the app's own
+  greedy consensus, or whether that just moves the hard part elsewhere. After
+  discussion (the per-locus classification machinery only needs the reference
+  tree's splits, not its origin, so accepting an external tree doesn't add a
+  new hard problem), asked to build it: an optional second file upload for a
+  user-supplied reference tree, validated to contain exactly the taxon union
+  across the gene trees (individual gene trees may still be missing taxa -
+  wording was corrected after the first pass conflated the two). The header
+  now shows where the reference tree came from.
+- Asked for the topology-support color legend (below the chromosome-order
+  track) to be clickable on/off per topology, to make subtler patterns
+  visible against a dominant one - already covered in section 9, extended
+  here to also cover the per-branch track the same way.
+- Asked for a legend explaining what branch color/thickness mean in the main
+  tree view itself (not just the locus tracks), as a dropdown so it doesn't
+  permanently occupy screen space. Added a "Legend" toolbar dropdown whose
+  content updates live to match whichever render mode (Support/Conflict/
+  Evidence) is currently selected.
+- Asked for the data-warnings banner to be fully dismissible with an X, not
+  just collapsible - added a separate dismiss control, reset on each new
+  dataset load.
+- Asked for a reference tree for the mammal sample and the four synthetic
+  samples, suggesting an averaged-subset approach. Since no true/ground-truth
+  tree survived from the (uncommitted) synthetic-data generator, and the
+  mammal set has no known species tree either, built a small script
+  (`scripts/gen-reference-trees.ts`) that constructs each sample's reference
+  tree from a reproducible random half of its own gene trees, using the app's
+  existing consensus + branch-length machinery. Wired these into the sample
+  picker as an opt-in checkbox. Checked honestly whether this actually
+  produces a different topology from the full-dataset consensus: yes for the
+  mammal set (1 of 19 branches), no for any of the four synthetic sets even
+  down to a 10% subsample (logged, not hidden).
+- Asked for a citation to be added crediting the source of the mammal sample
+  dataset (Chen, Liang & Zhang 2017, *Genome Biology and Evolution*).
+- Asked for Conflict render mode to use continuous red shading like Evidence
+  mode's gradient, instead of five flat categorical colors. Replaced the
+  categorical color with a continuous slate-to-red gradient driven by the
+  same value already used for branch width, so width and color reinforce one
+  signal; the specific conflict category (concentrated/contradicted/diffuse)
+  is no longer separately color-coded on the tree but remains available by
+  clicking a branch. Legend updated to match.
