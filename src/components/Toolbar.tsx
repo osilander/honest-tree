@@ -269,8 +269,10 @@ export function Toolbar({
         <div className="toolbar-group toolbar-metadata-group">
           <span className="toolbar-label">Locus metadata (optional)</span>
           <p className="dropzone-hint toolbar-metadata-hint">
-            Upload a CSV/TSV: first column = locus name (must match your gene tree names, e.g. "locus_1"), other columns = any per-locus
-            values (alignment length, GC%, dN/dS, GO category, chromosome, …).
+            Upload a TSV (or CSV): first column = locus name, matched by name not row order, so any order/subset is fine - other columns =
+            any per-locus values (alignment length, GC%, dN/dS, GO category, chromosome, …). For a plain multi-tree Newick input, locus
+            names are "locus_1", "locus_2", … in file order (Newick has no way to name a tree); for NEXUS input, it's whatever name follows
+            "tree" in your file.
           </p>
           <button className="reset-view-btn" onClick={() => metadataFileInputRef.current?.click()}>
             {metadataTable ? 'Replace metadata file…' : 'Upload metadata file…'}
@@ -278,7 +280,7 @@ export function Toolbar({
           <input
             ref={metadataFileInputRef}
             type="file"
-            accept=".csv,.tsv,.txt"
+            accept=".tsv,.csv,.txt"
             style={{ display: 'none' }}
             onChange={(e) => {
               const file = e.target.files?.[0];

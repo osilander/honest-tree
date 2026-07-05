@@ -1,14 +1,18 @@
 import type { LocusMetadataColumn, LocusMetadataTable } from '../types';
 
 /**
- * Parses a user-supplied per-locus metadata table (CSV or TSV). The first
- * column is always the locus-name join key, whatever its header is called -
- * it must match a locus name already in the loaded dataset (e.g. "locus_1").
- * Every other column becomes a named metadata field, auto-typed numeric or
- * categorical by whether every non-empty cell parses as a finite number.
+ * Parses a user-supplied per-locus metadata table (TSV by default, CSV also
+ * accepted). The first column is always the locus-name join key, whatever
+ * its header is called - matching is by name, not row position, so the
+ * metadata file can list loci in any order and cover any subset of them. It
+ * must match a locus name already in the loaded dataset - for a plain
+ * multi-tree Newick input that name is "locus_N" (1-based, in file order,
+ * since Newick has nowhere to embed a per-tree name); for a NEXUS input with
+ * `tree <name> = (...)` statements, it's that name instead. Every other
+ * column becomes a named metadata field, auto-typed numeric or categorical
+ * by whether every non-empty cell parses as a finite number.
  */
 export function parseLocusMetadataTable(text: string, knownLoci: Set<string>): { table: LocusMetadataTable; warnings: string[] } {
-  const delimiter = text.includes('\t') ? '\t' : ',';
   const lines = text
     .split(/\r\n?|\n/)
     .map((l) => l.trim())
@@ -17,6 +21,11 @@ export function parseLocusMetadataTable(text: string, knownLoci: Set<string>): {
     throw new Error('Metadata file must have a header row (locus-name column + at least one metadata column) plus at least one data row.');
   }
 
+  // Tab-separated is the default/preferred format - safer for fields that may
+  // themselves contain commas (e.g. GO term descriptions) - and is detected
+  // from the header line alone, not the whole file, so a comma-separated
+  // value elsewhere can't cause a wrong delimiter guess.
+  const delimiter = lines[0].includes('\t') ? '\t' : ',';
   const header = lines[0].split(delimiter).map((h) => h.trim());
   if (header.length < 2) {
     throw new Error('Metadata file must have at least two columns: a locus-name column, then one or more metadata columns.');
