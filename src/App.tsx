@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useStore } from './state/store';
 import { Dropzone } from './components/Dropzone';
 import { Toolbar } from './components/Toolbar';
@@ -14,6 +14,12 @@ function App() {
   const { state, dispatch } = useStore();
   const treeRef = useRef<HonestTreeHandle>(null);
   const [warningsOpen, setWarningsOpen] = useState(false);
+  const [warningsDismissed, setWarningsDismissed] = useState(false);
+
+  useEffect(() => {
+    setWarningsOpen(false);
+    setWarningsDismissed(false);
+  }, [state.dataset]);
 
   const selectedBranch =
     state.dataset && state.app.selectedBranchId ? state.dataset.branches.get(state.app.selectedBranchId) ?? null : null;
@@ -41,11 +47,16 @@ function App() {
 
       {state.loadError && <div className="error-banner">{state.loadError}</div>}
 
-      {state.dataset && state.dataset.warnings.length > 0 && (
+      {state.dataset && state.dataset.warnings.length > 0 && !warningsDismissed && (
         <div className="warnings-banner">
-          <button onClick={() => setWarningsOpen((v) => !v)}>
-            {warningsOpen ? 'Hide' : 'Show'} {state.dataset.warnings.length} data warning(s)
-          </button>
+          <div className="warnings-banner-row">
+            <button onClick={() => setWarningsOpen((v) => !v)}>
+              {warningsOpen ? 'Hide' : 'Show'} {state.dataset.warnings.length} data warning(s)
+            </button>
+            <button className="warnings-dismiss" onClick={() => setWarningsDismissed(true)} title="Dismiss" aria-label="Dismiss warnings">
+              ×
+            </button>
+          </div>
           {warningsOpen && (
             <ul>
               {state.dataset.warnings.map((w, i) => (
