@@ -257,6 +257,16 @@ export function Toolbar({
               Off
             </label>
           </div>
+          {appState.branchLocusTrackEnabled && (
+            <label className="checkbox-option" title="Group this branch's loci by reference/alternative/uninformative/missing instead of the shared chrom/rank/metadata order above.">
+              <input
+                type="checkbox"
+                checked={appState.branchTrackGroupByPattern}
+                onChange={(e) => dispatch({ type: 'SET_BRANCH_TRACK_GROUP_BY_PATTERN', value: e.target.checked })}
+              />
+              Group by this branch's pattern
+            </label>
+          )}
         </div>
 
         {appState.locusTrackMode !== 'off' && (

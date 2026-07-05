@@ -182,6 +182,8 @@ export interface AppState {
   locusTrackMode: 'off' | 'chrom' | 'sorted' | 'metadata';
   locusTrackMaxPoints: number | null;
   branchLocusTrackEnabled: boolean;
+  /** When true, the per-branch topology track groups loci by this branch's own classification (reference/alt/uninformative/missing) instead of the shared chrom/rank/metadata order. */
+  branchTrackGroupByPattern: boolean;
   taxonSampleMode: 'off' | 'random' | 'diverged';
   taxonSampleCount: number;
   taxonSampleSeed: number;

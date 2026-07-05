@@ -26,6 +26,7 @@ const initialAppState: AppState = {
   locusTrackMode: 'chrom',
   locusTrackMaxPoints: null,
   branchLocusTrackEnabled: true,
+  branchTrackGroupByPattern: false,
   taxonSampleMode: 'off',
   taxonSampleCount: 15,
   taxonSampleSeed: 0,
@@ -61,6 +62,7 @@ export type Action =
   | { type: 'SET_LOCUS_TRACK_MODE'; mode: 'off' | 'chrom' | 'sorted' | 'metadata' }
   | { type: 'SET_LOCUS_TRACK_MAX_POINTS'; value: number | null }
   | { type: 'SET_BRANCH_LOCUS_TRACK_ENABLED'; value: boolean }
+  | { type: 'SET_BRANCH_TRACK_GROUP_BY_PATTERN'; value: boolean }
   | { type: 'SET_TAXON_SAMPLE_MODE'; mode: 'off' | 'random' | 'diverged' }
   | { type: 'SET_TAXON_SAMPLE_COUNT'; value: number }
   | { type: 'RESAMPLE_TAXA' }
@@ -108,6 +110,8 @@ function reducer(state: StoreState, action: Action): StoreState {
       return { ...state, app: { ...state.app, locusTrackMaxPoints: action.value } };
     case 'SET_BRANCH_LOCUS_TRACK_ENABLED':
       return { ...state, app: { ...state.app, branchLocusTrackEnabled: action.value } };
+    case 'SET_BRANCH_TRACK_GROUP_BY_PATTERN':
+      return { ...state, app: { ...state.app, branchTrackGroupByPattern: action.value } };
     case 'SET_TAXON_SAMPLE_MODE':
       return { ...state, app: { ...state.app, taxonSampleMode: action.mode } };
     case 'SET_TAXON_SAMPLE_COUNT':

@@ -128,6 +128,7 @@ function App() {
                 mode={state.app.locusTrackMode === 'off' ? 'chrom' : state.app.locusTrackMode}
                 maxPoints={state.app.locusTrackMaxPoints}
                 metadataColumn={state.app.metadataTrackColumn}
+                groupByPattern={state.app.branchTrackGroupByPattern}
               />
             )}
             {state.app.locusTrackMode !== 'off' && (

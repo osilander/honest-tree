@@ -10,11 +10,28 @@ interface BranchLocusTrackProps {
   mode: LocusOrderMode;
   maxPoints: number | null;
   metadataColumn: string | null;
+  groupByPattern: boolean;
 }
 
-export function BranchLocusTrack({ dataset, branch, mode, maxPoints, metadataColumn }: BranchLocusTrackProps) {
+export function BranchLocusTrack({ dataset, branch, mode, maxPoints, metadataColumn, groupByPattern }: BranchLocusTrackProps) {
   const ranked = withAltRanks(branch.topologyPatterns);
-  const names = orderedLoci(dataset, mode, metadataColumn);
+  const baseNames = orderedLoci(dataset, mode, metadataColumn);
+
+  // Optionally group loci by this branch's own classification (reference,
+  // then each alternative by rank, then other/uninformative/missing) -
+  // ties broken by the base order above (stable sort), so within a group
+  // loci still follow whatever chrom/rank/metadata order was chosen.
+  const groupOrder = [...branch.topologyPatterns.map((p) => p.key), 'uninformative', 'missing'];
+  const groupRank = new Map(groupOrder.map((k, i) => [k, i]));
+  const groupKeyFor = (name: string): string => {
+    const key = branch.locusPatternKey[name] ?? 'missing';
+    if (key === 'missing' || key === 'uninformative') return key;
+    return ranked.some((r) => r.pattern.key === key) ? key : 'other';
+  };
+  const names = groupByPattern
+    ? [...baseNames].sort((a, b) => (groupRank.get(groupKeyFor(a)) ?? Infinity) - (groupRank.get(groupKeyFor(b)) ?? Infinity))
+    : baseNames;
+
   const shown = subsample(names, maxPoints);
   const total = shown.length || 1;
   const subsampled = shown.length < names.length;
@@ -59,7 +76,7 @@ export function BranchLocusTrack({ dataset, branch, mode, maxPoints, metadataCol
     <div className="locus-track">
       <div className="locus-track-header">
         <span className="toolbar-label">
-          {branch.branchId} topology, {orderLabel(mode, metadataColumn)}
+          {branch.branchId} topology, {groupByPattern ? 'grouped by this branch’s pattern' : orderLabel(mode, metadataColumn)}
           {subsampled && ` - showing ${shown.length} of ${names.length} loci`}
         </span>
       </div>
