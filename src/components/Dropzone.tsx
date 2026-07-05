@@ -14,7 +14,9 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
   const [dragging, setDragging] = useState(false);
   const [sampleChoice, setSampleChoice] = useState(SAMPLE_DATASETS[0].file);
   const [sampleLoading, setSampleLoading] = useState(false);
+  const [refTree, setRefTree] = useState<{ text: string; name: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const refFileInputRef = useRef<HTMLInputElement | null>(null);
 
   const loadFromText = useCallback(
     (text: string, name: string) => {
@@ -26,7 +28,7 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           try {
-            const dataset = loadDatasetFromText(text, name);
+            const dataset = loadDatasetFromText(text, name, refTree?.text, refTree?.name);
             dispatch({ type: 'LOAD_DATASET', dataset });
           } catch (e) {
             dispatch({ type: 'LOAD_ERROR', message: (e as Error).message });
@@ -34,7 +36,7 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
         });
       });
     },
-    [dispatch],
+    [dispatch, refTree],
   );
 
   const handleFile = useCallback(
@@ -44,6 +46,11 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
     },
     [loadFromText],
   );
+
+  const handleRefFile = useCallback(async (file: File) => {
+    const text = await file.text();
+    setRefTree({ text, name: file.name });
+  }, []);
 
   const handleLoadSample = useCallback(async () => {
     setSampleLoading(true);
@@ -114,6 +121,30 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
                 {sampleLoading ? 'Loading…' : 'Load'}
               </button>
             </div>
+          </div>
+          <div className="dropzone-reftree">
+            <p className="dropzone-hint">
+              Optional: supply your own reference tree (e.g. a species-tree estimate) instead of building one from these
+              gene trees. Must contain exactly the same taxa.
+            </p>
+            {refTree ? (
+              <div className="dropzone-reftree-row">
+                <span className="dropzone-reftree-name">✓ {refTree.name}</span>
+                <button onClick={() => setRefTree(null)}>Remove</button>
+              </div>
+            ) : (
+              <button onClick={() => refFileInputRef.current?.click()}>Choose reference tree file…</button>
+            )}
+            <input
+              ref={refFileInputRef}
+              type="file"
+              accept=".nwk,.newick,.tree,.trees,.nex,.nexus,.txt"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleRefFile(file);
+              }}
+            />
           </div>
         </div>
       </div>

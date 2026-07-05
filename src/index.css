@@ -790,6 +790,36 @@ body {
   white-space: nowrap;
 }
 
+.dropzone-reftree {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.dropzone-reftree .dropzone-hint {
+  margin-top: 0;
+  max-width: 340px;
+}
+
+.dropzone-reftree button {
+  margin-top: 8px;
+  padding: 6px 14px;
+  font-size: 12px;
+}
+
+.dropzone-reftree-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.dropzone-reftree-name {
+  font-size: 12px;
+  color: #166534;
+  font-weight: 600;
+}
+
 @media print {
   .app-header,
   .toolbar,

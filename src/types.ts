@@ -218,6 +218,10 @@ export interface Dataset {
   taxa: string[];
   geneTrees: ParsedTree[];
   referenceTree: RawNode;
+  /** Where referenceTree came from: built here via greedy consensus, or supplied by the user (e.g. a species-tree estimate). */
+  referenceTreeSource: 'consensus' | 'user';
+  /** Original filename of the user-supplied reference tree, when referenceTreeSource === 'user'. */
+  referenceTreeFileName?: string;
   branches: Map<string, BranchRecord>;
   /** branchId assigned in the reference tree's own preorder, stable across re-renders. */
   locusMetadata: Map<string, LocusMetadata>;

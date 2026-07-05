@@ -24,7 +24,16 @@ function App() {
         <h1>Phylogenetic Uncertainty Browser</h1>
         {state.dataset && (
           <span className="dataset-summary">
-            {state.dataset.taxa.length} taxa · {state.dataset.geneTrees.length} loci · {state.dataset.branches.size} branches
+            {state.dataset.taxa.length} taxa · {state.dataset.geneTrees.length} loci · {state.dataset.branches.size} branches ·{' '}
+            {state.dataset.referenceTreeSource === 'user' ? (
+              <span title={`Reference tree supplied by you: ${state.dataset.referenceTreeFileName}`}>
+                reference: {state.dataset.referenceTreeFileName}
+              </span>
+            ) : (
+              <span title="Reference tree built here via greedy compatible-splits consensus over your gene trees.">
+                reference: greedy consensus
+              </span>
+            )}
           </span>
         )}
         <MethodsPopover />

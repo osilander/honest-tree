@@ -22,10 +22,11 @@ export function MethodsPopover() {
               <dl>
                 <dt>Reference tree</dt>
                 <dd>
-                  Greedy compatible-splits consensus from your input gene trees - not a Bayesian posterior summary, not species-tree inference.
-                  I.e. no population-/species-level model of <em>why</em> trees disagree (e.g. incomplete lineage sorting) - just a frequency
-                  tally, so it can't recover cases where the true species tree differs from the most common gene tree topology (the "anomaly
-                  zone").
+                  By default, a greedy compatible-splits consensus from your input gene trees - not a Bayesian posterior summary, not
+                  species-tree inference. I.e. no population-/species-level model of <em>why</em> trees disagree (e.g. incomplete lineage
+                  sorting) - just a frequency tally, so it can't recover cases where the true species tree differs from the most common gene
+                  tree topology (the "anomaly zone"). You can instead supply your own reference tree (e.g. a proper species-tree estimate) when
+                  loading data - every branch is then evaluated against that tree instead.
                 </dd>
 
                 <dt>Clade recovery</dt>
