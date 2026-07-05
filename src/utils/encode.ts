@@ -1,6 +1,6 @@
 import type { BranchRecord, RenderMode, SupportMetricKey } from '../types';
 import { getSupportMetricValue } from '../phylo/metrics';
-import { CONFLICT_COLORS, NEUTRAL_BRANCH, evidenceColor, scaleOpacity, scaleWidth } from './color';
+import { NEUTRAL_BRANCH, conflictColor, evidenceColor, scaleOpacity, scaleWidth } from './color';
 
 export interface BranchStyle {
   width: number;
@@ -20,7 +20,7 @@ export function encodeBranch(renderMode: RenderMode, record: BranchRecord | null
       return {
         width: scaleWidth(1 - record.support.concordantProportion),
         opacity: scaleOpacity(decisiveFraction),
-        color: CONFLICT_COLORS[record.dominantConflict],
+        color: conflictColor(record.dominantConflict, record.support.concordantProportion),
       };
     case 'evidence':
       return {

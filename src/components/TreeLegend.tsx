@@ -1,28 +1,36 @@
 import type { RenderMode } from '../types';
-import { CONFLICT_COLORS, EVIDENCE_GREY, EVIDENCE_GREY_CUTOFF, EVIDENCE_HIGH_COLOR, EVIDENCE_LOW_COLOR, NEUTRAL_BRANCH } from '../utils/color';
-
-const CONFLICT_ROWS: { key: keyof typeof CONFLICT_COLORS; label: string; desc: string }[] = [
-  { key: 'low_conflict', label: 'Low conflict', desc: 'Reference split well supported, little to no conflict' },
-  { key: 'concentrated', label: 'Concentrated', desc: 'One specific alternative topology dominates the conflict' },
-  { key: 'contradicted', label: 'Contradicted', desc: 'An alternative topology is more common than the reference' },
-  { key: 'diffuse', label: 'Diffuse', desc: 'Conflict spread thinly across many alternatives, none dominant' },
-  { key: 'missing_data', label: 'Missing data', desc: 'Too few decisive loci to classify this branch at all' },
-];
+import {
+  CONFLICT_HIGH_COLOR,
+  CONFLICT_LOW_COLOR,
+  CONFLICT_MISSING_DATA_COLOR,
+  EVIDENCE_GREY,
+  EVIDENCE_GREY_CUTOFF,
+  EVIDENCE_HIGH_COLOR,
+  EVIDENCE_LOW_COLOR,
+  NEUTRAL_BRANCH,
+} from '../utils/color';
 
 export function TreeLegend({ renderMode }: { renderMode: RenderMode }) {
   if (renderMode === 'conflict') {
     return (
       <div className="tree-legend">
         <p className="dropzone-hint">
-          <strong>Width</strong>: amount of discordance among decisive loci (thicker = more conflicting). <strong>Color</strong>: kind of
-          conflict.
+          <strong>Width and color</strong> both track the amount of discordance among decisive loci - thicker and darker red means more
+          decisive loci disagree with the reference.
         </p>
-        {CONFLICT_ROWS.map((r) => (
-          <div key={r.key} className="legend-item" title={r.desc}>
-            <span className="legend-swatch" style={{ background: CONFLICT_COLORS[r.key] }} />
-            <strong>{r.label}</strong> - {r.desc}
-          </div>
-        ))}
+        <div className="tree-legend-gradient" style={{ background: `linear-gradient(90deg, ${CONFLICT_LOW_COLOR}, ${CONFLICT_HIGH_COLOR})` }} />
+        <div className="tree-legend-gradient-labels">
+          <span>No conflict</span>
+          <span>Severe conflict</span>
+        </div>
+        <div className="legend-item" title="Too few decisive loci to assess conflict at all - not a point on the severity scale.">
+          <span className="legend-swatch" style={{ background: CONFLICT_MISSING_DATA_COLOR }} />
+          <strong>Grey</strong> - too few decisive loci to assess conflict at all
+        </div>
+        <p className="dropzone-hint">
+          Click a branch for its specific conflict pattern - concentrated in one alternative, contradicted by a more common one, or diffuse
+          across many.
+        </p>
       </div>
     );
   }

@@ -36,14 +36,32 @@ export function topologyRankColor(rank: number, isOther: boolean): string {
   return altPatternColor(rank - 2);
 }
 
-export const CONFLICT_COLORS: Record<DominantConflict, string> = {
-  none: NEUTRAL_BRANCH,
-  low_conflict: '#475569', // slate-600, restrained neutral
-  concentrated: '#dc2626', // red-600 - one specific alternative dominates
-  contradicted: '#991b1b', // red-800 - the alternative actually beats the reference
-  diffuse: '#9ca3af', // grey-400
-  missing_data: '#cbd5e1', // grey-300
-};
+export const CONFLICT_MISSING_DATA_COLOR = '#cbd5e1'; // grey-300 - too few decisive loci to assess conflict at all, not a point on the severity scale
+
+const CONFLICT_LOW = [148, 163, 184]; // slate-400 - no meaningful conflict
+const CONFLICT_HIGH = [127, 29, 29]; // red-900 - severe conflict
+export const CONFLICT_LOW_COLOR = `rgb(${CONFLICT_LOW.join(',')})`;
+export const CONFLICT_HIGH_COLOR = `rgb(${CONFLICT_HIGH.join(',')})`;
+
+/**
+ * Conflict mode's color channel: continuous shading from neutral slate (no
+ * conflict) to deep red (severe conflict), scaled by the same value that
+ * drives branch width (1 - concordantProportion) so color and width
+ * reinforce one signal instead of splitting attention across two. The
+ * specific *kind* of conflict (concentrated in one alternative, contradicted
+ * by a more common one, or diffuse across many) is still available per
+ * branch in the evidence panel - it's just not separately color-coded here
+ * anymore. missing_data gets a flat, distinct grey instead of participating
+ * in the gradient, since "no data to assess conflict" isn't a severity level.
+ */
+export function conflictColor(dominantConflict: DominantConflict, concordantProportion: number): string {
+  if (dominantConflict === 'missing_data') return CONFLICT_MISSING_DATA_COLOR;
+  const severity = Math.max(0, Math.min(1, 1 - concordantProportion));
+  const r = Math.round(CONFLICT_LOW[0] + (CONFLICT_HIGH[0] - CONFLICT_LOW[0]) * severity);
+  const g = Math.round(CONFLICT_LOW[1] + (CONFLICT_HIGH[1] - CONFLICT_LOW[1]) * severity);
+  const b = Math.round(CONFLICT_LOW[2] + (CONFLICT_HIGH[2] - CONFLICT_LOW[2]) * severity);
+  return `rgb(${r},${g},${b})`;
+}
 
 export const EVIDENCE_GREY = '#9ca3af'; // grey-400 - no/low usable evidence at all, a different qualitative state
 export const EVIDENCE_GREY_CUTOFF = 0.15;
