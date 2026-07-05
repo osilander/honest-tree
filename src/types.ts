@@ -179,7 +179,7 @@ export interface AppState {
   tipLabelSize: number;
   branchWidthScale: number;
   showSupportValues: boolean;
-  locusTrackMode: 'off' | 'chrom' | 'sorted';
+  locusTrackMode: 'off' | 'chrom' | 'sorted' | 'metadata';
   locusTrackMaxPoints: number | null;
   branchLocusTrackEnabled: boolean;
   taxonSampleMode: 'off' | 'random' | 'diverged';

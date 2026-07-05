@@ -1,18 +1,18 @@
 import { useMemo, useState } from 'react';
 import type { Dataset } from '../types';
 import { HIDDEN_COLOR, METADATA_HIGH_COLOR, METADATA_LOW_COLOR, METADATA_NO_DATA_COLOR, metadataCategoricalColor, metadataNumericColor } from '../utils/color';
-import { orderedLoci, subsample } from '../utils/locusOrder';
+import { orderLabel, orderedLoci, subsample, type LocusOrderMode } from '../utils/locusOrder';
 
 interface LocusMetadataTrackProps {
   dataset: Dataset;
-  mode: 'chrom' | 'sorted';
+  mode: LocusOrderMode;
   maxPoints: number | null;
   column: string;
 }
 
 export function LocusMetadataTrack({ dataset, mode, maxPoints, column }: LocusMetadataTrackProps) {
   const table = dataset.locusMetadataTable;
-  const names = orderedLoci(dataset, mode);
+  const names = orderedLoci(dataset, mode, column);
   const shown = subsample(names, maxPoints);
   const total = shown.length || 1;
   const subsampled = shown.length < names.length;
@@ -83,7 +83,7 @@ export function LocusMetadataTrack({ dataset, mode, maxPoints, column }: LocusMe
     <div className="locus-track">
       <div className="locus-track-header">
         <span className="toolbar-label">
-          Locus metadata - {column}, {mode === 'chrom' ? 'file order (chromosome position)' : 'sorted by rank'}
+          Locus metadata - {column}, {orderLabel(mode, column)}
           {subsampled && ` - showing ${shown.length} of ${names.length} loci`}
         </span>
       </div>

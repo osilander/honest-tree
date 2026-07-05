@@ -58,7 +58,7 @@ export type Action =
   | { type: 'SET_TIP_LABEL_SIZE'; value: number }
   | { type: 'SET_BRANCH_WIDTH_SCALE'; value: number }
   | { type: 'TOGGLE_SUPPORT_VALUES' }
-  | { type: 'SET_LOCUS_TRACK_MODE'; mode: 'off' | 'chrom' | 'sorted' }
+  | { type: 'SET_LOCUS_TRACK_MODE'; mode: 'off' | 'chrom' | 'sorted' | 'metadata' }
   | { type: 'SET_LOCUS_TRACK_MAX_POINTS'; value: number | null }
   | { type: 'SET_BRANCH_LOCUS_TRACK_ENABLED'; value: boolean }
   | { type: 'SET_TAXON_SAMPLE_MODE'; mode: 'off' | 'random' | 'diverged' }

@@ -127,10 +127,16 @@ function App() {
                 branch={selectedBranch}
                 mode={state.app.locusTrackMode === 'off' ? 'chrom' : state.app.locusTrackMode}
                 maxPoints={state.app.locusTrackMaxPoints}
+                metadataColumn={state.app.metadataTrackColumn}
               />
             )}
             {state.app.locusTrackMode !== 'off' && (
-              <LocusTopologyTrack dataset={state.dataset} mode={state.app.locusTrackMode} maxPoints={state.app.locusTrackMaxPoints} />
+              <LocusTopologyTrack
+                dataset={state.dataset}
+                mode={state.app.locusTrackMode}
+                maxPoints={state.app.locusTrackMaxPoints}
+                metadataColumn={state.app.metadataTrackColumn}
+              />
             )}
             {state.app.metadataTrackColumn && state.dataset.locusMetadataTable && (
               <LocusMetadataTrack

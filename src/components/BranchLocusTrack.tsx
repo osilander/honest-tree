@@ -1,19 +1,20 @@
 import { useState } from 'react';
 import type { BranchRecord, Dataset } from '../types';
 import { HIDDEN_COLOR, MISSING_COLOR, OTHER_COLOR, UNINFORMATIVE_COLOR } from '../utils/color';
-import { orderedLoci, subsample } from '../utils/locusOrder';
+import { orderLabel, orderedLoci, subsample, type LocusOrderMode } from '../utils/locusOrder';
 import { patternColor, patternLabel, patternTag, withAltRanks } from '../utils/pattern';
 
 interface BranchLocusTrackProps {
   dataset: Dataset;
   branch: BranchRecord;
-  mode: 'chrom' | 'sorted';
+  mode: LocusOrderMode;
   maxPoints: number | null;
+  metadataColumn: string | null;
 }
 
-export function BranchLocusTrack({ dataset, branch, mode, maxPoints }: BranchLocusTrackProps) {
+export function BranchLocusTrack({ dataset, branch, mode, maxPoints, metadataColumn }: BranchLocusTrackProps) {
   const ranked = withAltRanks(branch.topologyPatterns);
-  const names = orderedLoci(dataset, mode);
+  const names = orderedLoci(dataset, mode, metadataColumn);
   const shown = subsample(names, maxPoints);
   const total = shown.length || 1;
   const subsampled = shown.length < names.length;
@@ -58,7 +59,7 @@ export function BranchLocusTrack({ dataset, branch, mode, maxPoints }: BranchLoc
     <div className="locus-track">
       <div className="locus-track-header">
         <span className="toolbar-label">
-          {branch.branchId} topology, {mode === 'chrom' ? 'file order (chromosome position)' : 'sorted by rank'}
+          {branch.branchId} topology, {orderLabel(mode, metadataColumn)}
           {subsampled && ` - showing ${shown.length} of ${names.length} loci`}
         </span>
       </div>

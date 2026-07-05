@@ -221,6 +221,17 @@ export function Toolbar({
               />
               Sorted by rank
             </label>
+            {appState.metadataTrackColumn && (
+              <label className="radio-option" title={`Sort all locus tracks by ${appState.metadataTrackColumn} - numeric columns ascending, categorical columns grouped by most common first.`}>
+                <input
+                  type="radio"
+                  name="locusTrackMode"
+                  checked={appState.locusTrackMode === 'metadata'}
+                  onChange={() => dispatch({ type: 'SET_LOCUS_TRACK_MODE', mode: 'metadata' })}
+                />
+                Sorted by {appState.metadataTrackColumn}
+              </label>
+            )}
           </div>
         </div>
 
