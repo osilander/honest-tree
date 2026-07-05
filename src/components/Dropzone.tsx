@@ -125,7 +125,8 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
           <div className="dropzone-reftree">
             <p className="dropzone-hint">
               Optional: supply your own reference tree (e.g. a species-tree estimate) instead of building one from these
-              gene trees. Must contain exactly the same taxa.
+              gene trees. It must contain every taxon that appears in any of your gene trees, and no others - individual
+              gene trees are still allowed to have missing taxa.
             </p>
             {refTree ? (
               <div className="dropzone-reftree-row">

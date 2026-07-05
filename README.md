@@ -32,8 +32,11 @@ gCF/bootstrap/posterior support viewer (yet). Specifically:
 - **Bring your own reference tree**: instead of the built-in consensus, you
   can supply your own reference tree when loading data (e.g. one inferred
   with ASTRAL, StarBEAST2, or any other coalescent-aware species-tree
-  method). It must contain exactly the same taxa as your gene trees. Every
-  branch is then evaluated against that tree using the same per-locus
+  method). It must contain every taxon that appears in any of your gene
+  trees, and no others - individual gene trees are still allowed to have
+  missing taxa, only the reference tree's taxon set has to match the full
+  union across all of them. Every branch is then evaluated against that
+  tree using the same per-locus
   classification machinery, regardless of where the reference tree came
   from - so this is the way to see discordance/anomaly-zone diagnostics
   against a tree that isn't limited to the majority gene-tree topology.
