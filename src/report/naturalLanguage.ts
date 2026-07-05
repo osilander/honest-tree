@@ -35,9 +35,15 @@ function topAlt(b: BranchRecord): { pattern: TopologyPattern; altRank: number } 
 }
 
 function characterizeSupport(b: BranchRecord): string {
-  const { decisiveLoci } = b.counts;
+  const { decisiveLoci, missingLoci, uninformativeLoci } = b.counts;
   if (decisiveLoci === 0) {
-    return 'This branch has no decisive evidence in the current data set; interpretation is limited entirely by missing taxa.';
+    const reason =
+      uninformativeLoci > 0 && missingLoci > 0
+        ? 'missing taxa and uninformative loci'
+        : uninformativeLoci > 0
+          ? 'uninformative loci'
+          : 'missing taxa';
+    return `This branch has no decisive evidence in the current data set; interpretation is limited entirely by ${reason}.`;
   }
   switch (b.dominantConflict) {
     case 'low_conflict':
@@ -103,6 +109,11 @@ function extraSentences(b: BranchRecord): string[] {
   const c = b.counts;
   if (c.totalLoci > 0 && c.missingLoci / c.totalLoci >= 0.3) {
     out.push(`Interpretation is limited by missing data - ${c.missingLoci} of ${c.totalLoci} loci lack enough taxa to test this branch.`);
+  }
+  if (c.totalLoci > 0 && c.uninformativeLoci / c.totalLoci >= 0.15) {
+    out.push(
+      `${c.uninformativeLoci} of ${c.totalLoci} loci have all the relevant taxa but do not clearly support the reference or any specific alternative.`,
+    );
   }
   return out;
 }

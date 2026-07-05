@@ -1,5 +1,5 @@
 import type { BranchRecord, Dataset } from '../types';
-import { MISSING_COLOR, OTHER_COLOR } from '../utils/color';
+import { MISSING_COLOR, OTHER_COLOR, UNINFORMATIVE_COLOR } from '../utils/color';
 import { orderedLoci, subsample } from '../utils/locusOrder';
 import { patternColor, patternLabel, patternTag, withAltRanks } from '../utils/pattern';
 
@@ -21,6 +21,7 @@ export function BranchLocusTrack({ dataset, branch, mode, maxPoints }: BranchLoc
 
   const colorFor = (key: string): string => {
     if (key === 'missing') return MISSING_COLOR;
+    if (key === 'uninformative') return UNINFORMATIVE_COLOR;
     const found = patternFor(key);
     // A key not present among the named/other patterns is a tail alternative
     // folded into "other" for display - color and label it that way too.
@@ -28,7 +29,8 @@ export function BranchLocusTrack({ dataset, branch, mode, maxPoints }: BranchLoc
   };
 
   const labelFor = (key: string): string => {
-    if (key === 'missing') return 'Missing / uninformative at this branch';
+    if (key === 'missing') return 'Missing taxa at this branch';
+    if (key === 'uninformative') return 'Uninformative - no clear signal for any topology';
     const found = patternFor(key);
     return found ? patternLabel(branch, found.pattern, found.altRank) : 'Other (minor alternative)';
   };
@@ -67,6 +69,12 @@ export function BranchLocusTrack({ dataset, branch, mode, maxPoints }: BranchLoc
           <span className="legend-item">
             <span className="legend-swatch" style={{ background: MISSING_COLOR }} />
             Missing: {branch.counts.missingLoci}
+          </span>
+        )}
+        {branch.counts.uninformativeLoci > 0 && (
+          <span className="legend-item" title="Relevant taxa are present, but no clear signal for any topology.">
+            <span className="legend-swatch" style={{ background: UNINFORMATIVE_COLOR }} />
+            Uninformative: {branch.counts.uninformativeLoci}
           </span>
         )}
       </div>

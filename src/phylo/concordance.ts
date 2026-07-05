@@ -242,7 +242,12 @@ function classifyLocus(
       }
     }
   }
-  return { key: `alt_${extra.toString(36)}`, extraMask: extra };
+  // No intermediate clade, and no clean pairing with either sibling group
+  // either - this locus's placement of the branch's taxa doesn't match the
+  // reference and doesn't point at any identifiable rival grouping. That's
+  // genuinely uninformative for this branch, not a specific alternative
+  // topology, and must not be reported as one.
+  return { key: 'uninformative', extraMask: extra };
 }
 
 function dominantConflictFor(decisiveLoci: number, mainCount: number, topAltCount: number): DominantConflict {
@@ -283,6 +288,7 @@ export function computeBranchRecords(
         const ownChildren = divideIntoTwoGroups(node.children, refMasks);
 
         let missingLoci = 0;
+        let uninformativeLoci = 0;
         const patterns = new Map<string, PatternAccumulator>();
         const locusPatternKey: Record<string, string> = {};
         const taxonConflict = new Map<string, number>();
@@ -307,6 +313,13 @@ export function computeBranchRecords(
           }
 
           const { key, extraMask } = classifyLocus(entry, at, ownChildren, siblings);
+
+          if (key === 'uninformative') {
+            uninformativeLoci++;
+            locusPatternKey[entry.name] = 'uninformative';
+            continue;
+          }
+
           locusPatternKey[entry.name] = key;
 
           const acc = patterns.get(key);
@@ -344,7 +357,7 @@ export function computeBranchRecords(
           }
         }
 
-        const decisiveLoci = totalLoci - missingLoci;
+        const decisiveLoci = totalLoci - missingLoci - uninformativeLoci;
         const mainAcc = patterns.get('main');
         const mainCount = mainAcc?.count ?? 0;
         const conflictingLociTotal = decisiveLoci - mainCount;
@@ -419,7 +432,7 @@ export function computeBranchRecords(
             concordantProportion,
             gcf: concordantProportion * 100,
           },
-          counts: { totalLoci, decisiveLoci, missingLoci },
+          counts: { totalLoci, decisiveLoci, missingLoci, uninformativeLoci },
           dominantConflict: dominantConflictFor(decisiveLoci, mainCount, topAltCount),
           topologyPatterns,
           locusPatternKey,

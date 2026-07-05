@@ -11,3 +11,43 @@ npm run dev
 
 Then open the printed localhost URL and drag a multi-tree Newick/NEXUS file
 (a set of gene trees) onto the page.
+
+## What this app does and doesn't do
+
+This is a **branch-centric gene-tree conflict browser**, not a formal
+gCF/bootstrap/posterior support viewer (yet). Specifically:
+
+- **Reference tree**: built as a greedy compatible-splits consensus from
+  your input gene/locus trees - clades are added in decreasing frequency
+  order, kept whenever compatible with what's already accepted. This is a
+  different kind of summary than a Bayesian posterior sample or a
+  species-tree inference method, even though the tree looks similar in
+  shape.
+- **"Clade recovery" (the `Clade recovery` metric)**: the fraction of
+  decisive input trees in which a branch's exact reference clade is
+  recovered. This is clade/split recovery frequency, **not** the formal
+  quartet-based gCF statistic (which asks a stricter question: among the
+  four subtrees around a branch, does each gene tree support the reference
+  quartet resolution, one of the two alternatives, or neither?).
+- **No bootstrap or posterior support** is computed, parsed, or imported
+  anywhere in the app - there's nothing to select in the UI for either,
+  since showing a value there would just silently substitute the clade
+  recovery number, which is misleading.
+- **Missing vs. uninformative loci** are tracked as two distinct
+  categories, both excluded from "decisive loci": *missing* means too few
+  of the branch's taxa are present in that locus to test it at all;
+  *uninformative* means all the relevant taxa are present, but that locus's
+  placement of them doesn't align with the reference clade or with any
+  identifiable local alternative - there's no coherent rival topology to
+  name, just scatter.
+- **Branch lengths** on the reference tree are estimates, not exact -
+  averaged per branch from whichever gene trees provide a usable reading,
+  distinguishing *exact* observations (the gene tree displays this precise
+  clade) from *fallback* observations (a coarser enclosing clade stood in
+  for it). Hover a branch to see the underlying distribution and that
+  exact/fallback split.
+
+The app's diagnostic value is in the second half of this list - local
+conflict patterns, taxon-movement diagnostics, and missing-vs-uninformative
+separation - not in presenting a single point-estimate tree as if every
+number on it were a formal, off-the-shelf phylogenetic statistic.

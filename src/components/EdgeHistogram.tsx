@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { BranchRecord } from '../types';
-import { MISSING_COLOR } from '../utils/color';
+import { MISSING_COLOR, UNINFORMATIVE_COLOR } from '../utils/color';
 import { patternColor, patternLabel, patternTag, withAltRanks } from '../utils/pattern';
 import { LocalSplitTreePair } from './LocalSplitTreePair';
 
@@ -28,6 +28,12 @@ export function EdgeHistogram({ branch }: { branch: BranchRecord }) {
           <div
             title={`Missing: ${counts.missingLoci} (${((counts.missingLoci / total) * 100).toFixed(1)}%)`}
             style={{ width: `${(counts.missingLoci / total) * 100}%`, background: MISSING_COLOR }}
+          />
+        )}
+        {counts.uninformativeLoci > 0 && (
+          <div
+            title={`Uninformative: ${counts.uninformativeLoci} (${((counts.uninformativeLoci / total) * 100).toFixed(1)}%)`}
+            style={{ width: `${(counts.uninformativeLoci / total) * 100}%`, background: UNINFORMATIVE_COLOR }}
           />
         )}
       </div>
@@ -67,6 +73,17 @@ export function EdgeHistogram({ branch }: { branch: BranchRecord }) {
             <span className="legend-pct">{((counts.missingLoci / total) * 100).toFixed(0)}%</span>
             <span className="legend-desc">Missing taxa</span>
             <span className="legend-count">({counts.missingLoci})</span>
+          </div>
+        )}
+        {counts.uninformativeLoci > 0 && (
+          <div
+            className="histogram-legend-row"
+            title="Relevant taxa are present, but this locus does not clearly support the reference or any specific alternative."
+          >
+            <span className="legend-swatch" style={{ background: UNINFORMATIVE_COLOR }} />
+            <span className="legend-pct">{((counts.uninformativeLoci / total) * 100).toFixed(0)}%</span>
+            <span className="legend-desc">Uninformative</span>
+            <span className="legend-count">({counts.uninformativeLoci})</span>
           </div>
         )}
       </div>

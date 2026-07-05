@@ -3,6 +3,7 @@ import type { DominantConflict } from '../types';
 export const NEUTRAL_BRANCH = '#64748b'; // slate-500
 export const MAIN_PATTERN_COLOR = '#2563eb'; // blue-600 - the reference/main resolution, everywhere
 export const MISSING_COLOR = '#e5e7eb'; // near-white grey - no data, not a topology
+export const UNINFORMATIVE_COLOR = '#e8dcb8'; // muted tan - data present, but no coherent signal for any topology (distinct from missing)
 export const OTHER_COLOR = '#cbd5e1'; // grey-300 - the collapsed long tail
 
 // Rank-based palette for named alternative patterns (2nd, 3rd, ... most common).

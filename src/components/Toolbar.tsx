@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type Dispatch, type ReactNode } from 'react';
-import type { AppState, RenderMode, SupportMetricKey } from '../types';
+import type { AppState, RenderMode } from '../types';
 import type { Action } from '../state/store';
 
 const RENDER_MODES: { value: RenderMode; label: string; title: string }[] = [
@@ -10,12 +10,6 @@ const RENDER_MODES: { value: RenderMode; label: string; title: string }[] = [
     label: 'Evidence',
     title: 'Width and color (blue = mostly decisive, yellow = mostly uninformative/missing, grey = almost no usable data) track decisiveness - "how much usable data exists", independent of what it says.',
   },
-];
-
-const SUPPORT_METRICS: { value: SupportMetricKey; label: string }[] = [
-  { value: 'gcf', label: 'gCF (simplified)' },
-  { value: 'bootstrap', label: 'Bootstrap' },
-  { value: 'posterior', label: 'Posterior' },
 ];
 
 const LOCUS_TRACK_POINT_OPTIONS: { value: string; label: string }[] = [
@@ -98,20 +92,6 @@ export function Toolbar({
               </label>
             ))}
           </div>
-        </div>
-
-        <div className="toolbar-group">
-          <span className="toolbar-label">Support metric</span>
-          <select
-            value={appState.supportMetric}
-            onChange={(e) => dispatch({ type: 'SET_SUPPORT_METRIC', metric: e.target.value as SupportMetricKey })}
-          >
-            {SUPPORT_METRICS.map((m) => (
-              <option key={m.value} value={m.value}>
-                {m.label}
-              </option>
-            ))}
-          </select>
         </div>
 
         <div className="toolbar-group">

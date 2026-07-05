@@ -8,6 +8,7 @@ import { LocusTopologyTrack } from './components/LocusTopologyTrack';
 import { BranchLocusTrack } from './components/BranchLocusTrack';
 import { TaxonSummaryPanel } from './components/TaxonSummaryPanel';
 import { LoadingOverlay } from './components/LoadingOverlay';
+import { MethodsPopover } from './components/MethodsPopover';
 
 function App() {
   const { state, dispatch } = useStore();
@@ -26,6 +27,7 @@ function App() {
             {state.dataset.taxa.length} taxa · {state.dataset.geneTrees.length} loci · {state.dataset.branches.size} branches
           </span>
         )}
+        <MethodsPopover />
       </header>
 
       {state.loadError && <div className="error-banner">{state.loadError}</div>}

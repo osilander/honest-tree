@@ -50,8 +50,18 @@ export interface SupportMetrics {
 
 export interface BranchCounts {
   totalLoci: number;
+  /** Loci that are both taxon-complete and topologically informative for this branch - excludes both missingLoci and uninformativeLoci. */
   decisiveLoci: number;
+  /** Too few of this branch's taxa are present in the locus to test it at all. */
   missingLoci: number;
+  /**
+   * All relevant taxa are present, but this locus's placement of them
+   * doesn't align with the reference clade OR any identifiable local
+   * alternative - there's no coherent rival topology to name, just scatter.
+   * Distinct from missingLoci (data absent) and from a real alt pattern
+   * (data present and pointing somewhere specific).
+   */
+  uninformativeLoci: number;
 }
 
 /**

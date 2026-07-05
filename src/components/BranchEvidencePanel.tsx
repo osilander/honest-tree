@@ -21,8 +21,8 @@ function buildCopyText(branch: BranchRecord): string {
     '',
     generateNaturalLanguageReport(branch),
     '',
-    `gCF: ${branch.support.gcf?.toFixed(1)}%`,
-    `Decisive loci: ${branch.counts.decisiveLoci}/${branch.counts.totalLoci} (missing: ${branch.counts.missingLoci})`,
+    `Clade recovery: ${branch.support.gcf?.toFixed(1)}%`,
+    `Decisive loci: ${branch.counts.decisiveLoci}/${branch.counts.totalLoci} (missing: ${branch.counts.missingLoci}, uninformative: ${branch.counts.uninformativeLoci})`,
     '',
     'Topology patterns:',
     ...withAltRanks(branch.topologyPatterns)
@@ -116,7 +116,9 @@ export function BranchEvidencePanel({
         <table className="metrics-table">
           <tbody>
             <tr>
-              <td>gCF (simplified)</td>
+              <td title="Fraction of decisive loci in which this exact reference clade is recovered. This is clade/split recovery, not the formal quartet-based gCF statistic.">
+                Clade recovery
+              </td>
               <td>{branch.support.gcf?.toFixed(1)}%</td>
             </tr>
           </tbody>
@@ -160,6 +162,12 @@ export function BranchEvidencePanel({
                 </button>
               </td>
               <td>{branch.counts.missingLoci}</td>
+            </tr>
+            <tr>
+              <td title="Relevant taxa are present, but this locus's placement of them doesn't align with the reference or any identifiable alternative - no coherent signal either way.">
+                Uninformative
+              </td>
+              <td>{branch.counts.uninformativeLoci}</td>
             </tr>
           </tbody>
         </table>
