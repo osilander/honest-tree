@@ -5,6 +5,7 @@ export const MAIN_PATTERN_COLOR = '#2563eb'; // blue-600 - the reference/main re
 export const MISSING_COLOR = '#e5e7eb'; // near-white grey - no data, not a topology
 export const UNINFORMATIVE_COLOR = '#e8dcb8'; // muted tan - data present, but no coherent signal for any topology (distinct from missing)
 export const OTHER_COLOR = '#cbd5e1'; // grey-300 - the collapsed long tail
+export const HIDDEN_COLOR = '#f8fafc'; // matches page background - toggled-off pattern, fades out rather than draws the eye
 
 // Rank-based palette for named alternative patterns (2nd, 3rd, ... most common).
 // Rank carries meaning ("the top alternative"), not hue identity across branches.
