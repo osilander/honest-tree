@@ -83,7 +83,7 @@ export function loadDatasetFromText(
     referenceTreeSource,
     referenceTreeFileName: referenceTreeSource === 'user' ? referenceTreeFileName : undefined,
     branches,
-    locusMetadata: new Map(),
+    locusMetadataTable: null,
     warnings,
     taxonIndex: index,
     topologyRanking,

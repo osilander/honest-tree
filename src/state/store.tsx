@@ -1,5 +1,5 @@
 import { createContext, useContext, useReducer, type Dispatch, type ReactNode } from 'react';
-import type { AppState, Dataset, RenderMode, SupportMetricKey } from '../types';
+import type { AppState, Dataset, LocusMetadataTable, RenderMode, SupportMetricKey } from '../types';
 
 export interface StoreState {
   dataset: Dataset | null;
@@ -32,6 +32,7 @@ const initialAppState: AppState = {
   rerootSplitId: null,
   searchTaxon: null,
   missingBreakdownOpen: false,
+  metadataTrackColumn: null,
 };
 
 const initialState: StoreState = {
@@ -65,7 +66,9 @@ export type Action =
   | { type: 'RESAMPLE_TAXA' }
   | { type: 'SET_SEARCH_TAXON'; taxon: string | null }
   | { type: 'TOGGLE_MISSING_BREAKDOWN' }
-  | { type: 'SET_REROOT_SPLIT'; splitId: string | null };
+  | { type: 'SET_REROOT_SPLIT'; splitId: string | null }
+  | { type: 'SET_LOCUS_METADATA'; table: LocusMetadataTable | null }
+  | { type: 'SET_METADATA_TRACK_COLUMN'; column: string | null };
 
 function reducer(state: StoreState, action: Action): StoreState {
   switch (action.type) {
@@ -117,6 +120,12 @@ function reducer(state: StoreState, action: Action): StoreState {
       return { ...state, app: { ...state.app, missingBreakdownOpen: !state.app.missingBreakdownOpen } };
     case 'SET_REROOT_SPLIT':
       return { ...state, app: { ...state.app, rerootSplitId: action.splitId } };
+    case 'SET_LOCUS_METADATA':
+      return state.dataset
+        ? { ...state, dataset: { ...state.dataset, locusMetadataTable: action.table }, app: { ...state.app, metadataTrackColumn: null } }
+        : state;
+    case 'SET_METADATA_TRACK_COLUMN':
+      return { ...state, app: { ...state.app, metadataTrackColumn: action.column } };
     default:
       return state;
   }

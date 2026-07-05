@@ -88,6 +88,26 @@ export function evidenceColor(decisiveFraction: number): string {
   return `rgb(${r},${g},${b})`;
 }
 
+const METADATA_LOW = [226, 232, 240]; // slate-200 - low end of a numeric metadata column
+const METADATA_HIGH = [76, 29, 149]; // violet-900 - high end - kept distinct from the red/blue-yellow hues used elsewhere
+export const METADATA_LOW_COLOR = `rgb(${METADATA_LOW.join(',')})`;
+export const METADATA_HIGH_COLOR = `rgb(${METADATA_HIGH.join(',')})`;
+export const METADATA_NO_DATA_COLOR = '#f1f5f9'; // near-white - locus has no value for this column, distinct from any real data point
+
+/** Continuous low->high shading for a numeric locus-metadata column, given a value already normalized to 0..1. */
+export function metadataNumericColor(t: number): string {
+  const clamped = Math.max(0, Math.min(1, t));
+  const r = Math.round(METADATA_LOW[0] + (METADATA_HIGH[0] - METADATA_LOW[0]) * clamped);
+  const g = Math.round(METADATA_LOW[1] + (METADATA_HIGH[1] - METADATA_LOW[1]) * clamped);
+  const b = Math.round(METADATA_LOW[2] + (METADATA_HIGH[2] - METADATA_LOW[2]) * clamped);
+  return `rgb(${r},${g},${b})`;
+}
+
+/** Reuses the same categorical palette as topology alternatives, so category color language stays consistent app-wide. */
+export function metadataCategoricalColor(categoryIndex: number): string {
+  return altPatternColor(categoryIndex);
+}
+
 export function scaleWidth(value: number, min = 1, max = 8): number {
   const clamped = Math.max(0, Math.min(1, value));
   return min + Math.sqrt(clamped) * (max - min);

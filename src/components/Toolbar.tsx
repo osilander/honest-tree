@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type Dispatch, type ReactNode } from 'react';
-import type { AppState, RenderMode } from '../types';
+import type { AppState, Dataset, RenderMode } from '../types';
 import type { Action } from '../state/store';
+import { parseLocusMetadataTable } from '../data/parseLocusMetadata';
 import { TreeLegend } from './TreeLegend';
 
 const RENDER_MODES: { value: RenderMode; label: string; title: string }[] = [
@@ -50,6 +51,7 @@ export function Toolbar({
   onDownloadSvg,
   onPrint,
   taxa,
+  dataset,
 }: {
   appState: AppState;
   dispatch: Dispatch<Action>;
@@ -57,7 +59,28 @@ export function Toolbar({
   onDownloadSvg: () => void;
   onPrint: () => void;
   taxa: string[];
+  dataset: Dataset;
 }) {
+  const [metadataMessage, setMetadataMessage] = useState<string | null>(null);
+  const metadataFileInputRef = useRef<HTMLInputElement | null>(null);
+  const metadataTable = dataset.locusMetadataTable;
+
+  const handleMetadataFile = async (file: File) => {
+    try {
+      const text = await file.text();
+      const knownLoci = new Set(dataset.geneTrees.map((t) => t.name));
+      const { table, warnings } = parseLocusMetadataTable(text, knownLoci);
+      dispatch({ type: 'SET_LOCUS_METADATA', table });
+      setMetadataMessage(
+        warnings.length > 0
+          ? `Loaded ${table.columns.length} column(s). ${warnings.join(' ')}`
+          : `Loaded ${table.columns.length} column(s) for ${table.values.size} loci.`,
+      );
+    } catch (e) {
+      setMetadataMessage((e as Error).message);
+    }
+  };
+
   return (
     <div className="toolbar">
       <div className="toolbar-group">
@@ -242,6 +265,45 @@ export function Toolbar({
             </select>
           </div>
         )}
+
+        <div className="toolbar-group toolbar-metadata-group">
+          <span className="toolbar-label">Locus metadata (optional)</span>
+          <p className="dropzone-hint toolbar-metadata-hint">
+            Upload a CSV/TSV: first column = locus name (must match your gene tree names, e.g. "locus_1"), other columns = any per-locus
+            values (alignment length, GC%, dN/dS, GO category, chromosome, …).
+          </p>
+          <button className="reset-view-btn" onClick={() => metadataFileInputRef.current?.click()}>
+            {metadataTable ? 'Replace metadata file…' : 'Upload metadata file…'}
+          </button>
+          <input
+            ref={metadataFileInputRef}
+            type="file"
+            accept=".csv,.tsv,.txt"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleMetadataFile(file);
+            }}
+          />
+          {metadataMessage && <p className="dropzone-hint toolbar-metadata-hint">{metadataMessage}</p>}
+
+          {metadataTable && (
+            <>
+              <span className="toolbar-label">Metadata track column</span>
+              <select
+                value={appState.metadataTrackColumn ?? 'off'}
+                onChange={(e) => dispatch({ type: 'SET_METADATA_TRACK_COLUMN', column: e.target.value === 'off' ? null : e.target.value })}
+              >
+                <option value="off">Off</option>
+                {metadataTable.columns.map((c) => (
+                  <option key={c.name} value={c.name}>
+                    {c.name} ({c.kind})
+                  </option>
+                ))}
+              </select>
+            </>
+          )}
+        </div>
       </ToolbarDropdown>
 
       <ToolbarDropdown label="Taxon sampler">

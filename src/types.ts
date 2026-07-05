@@ -136,17 +136,22 @@ export interface TopologyRanking {
   maxNamedRank: number;
 }
 
-export interface LocusMetadata {
-  locusId: string;
-  label: string;
-  chromosome?: string;
-  start?: number;
-  end?: number;
-  alignmentLength?: number;
-  missingTaxa?: string[];
-  gc?: number;
-  partition?: string;
-  treeFile?: string;
+export interface LocusMetadataColumn {
+  name: string;
+  kind: 'numeric' | 'categorical';
+}
+
+/**
+ * User-supplied per-locus metadata (alignment length, GC content, dN/dS, GO
+ * category, chromosome, whatever) - not derived by this app, since it only
+ * ever ingests tree topologies, never raw alignments. Schema-flexible on
+ * purpose: any named column from the uploaded table, auto-typed as numeric
+ * or categorical, rather than a fixed set of hardcoded fields.
+ */
+export interface LocusMetadataTable {
+  columns: LocusMetadataColumn[];
+  /** locus name (must match a geneTrees[].name) -> column name -> value */
+  values: Map<string, Record<string, number | string>>;
 }
 
 export type RenderMode =
@@ -183,6 +188,8 @@ export interface AppState {
   rerootSplitId: string | null;
   searchTaxon: string | null;
   missingBreakdownOpen: boolean;
+  /** Which uploaded locus-metadata column (if any) drives the secondary locus metadata track. */
+  metadataTrackColumn: string | null;
 }
 
 /** Raw parsed Newick node, before layout. */
@@ -223,8 +230,8 @@ export interface Dataset {
   /** Original filename of the user-supplied reference tree, when referenceTreeSource === 'user'. */
   referenceTreeFileName?: string;
   branches: Map<string, BranchRecord>;
-  /** branchId assigned in the reference tree's own preorder, stable across re-renders. */
-  locusMetadata: Map<string, LocusMetadata>;
+  /** User-uploaded per-locus metadata table, if any - see LocusMetadataTable. */
+  locusMetadataTable: LocusMetadataTable | null;
   warnings: string[];
   /** taxon name -> bit index, plus the full-universe bitmask; stable for this dataset. */
   taxonIndex: { taxa: string[]; indexOf: Map<string, number>; fullMask: bigint };

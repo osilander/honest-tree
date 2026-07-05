@@ -6,6 +6,7 @@ import { HonestTree, type HonestTreeHandle } from './components/HonestTree';
 import { BranchEvidencePanel } from './components/BranchEvidencePanel';
 import { LocusTopologyTrack } from './components/LocusTopologyTrack';
 import { BranchLocusTrack } from './components/BranchLocusTrack';
+import { LocusMetadataTrack } from './components/LocusMetadataTrack';
 import { TaxonSummaryPanel } from './components/TaxonSummaryPanel';
 import { LoadingOverlay } from './components/LoadingOverlay';
 import { MethodsPopover } from './components/MethodsPopover';
@@ -75,6 +76,7 @@ function App() {
           onDownloadSvg={() => treeRef.current?.downloadSvg()}
           onPrint={() => window.print()}
           taxa={state.dataset.taxa}
+          dataset={state.dataset}
         />
       )}
 
@@ -112,21 +114,32 @@ function App() {
         </div>
       </div>
 
-      {state.dataset && (state.app.locusTrackMode !== 'off' || (state.app.branchLocusTrackEnabled && selectedBranch)) && (
-        <>
-          {state.app.branchLocusTrackEnabled && selectedBranch && (
-            <BranchLocusTrack
-              dataset={state.dataset}
-              branch={selectedBranch}
-              mode={state.app.locusTrackMode === 'off' ? 'chrom' : state.app.locusTrackMode}
-              maxPoints={state.app.locusTrackMaxPoints}
-            />
-          )}
-          {state.app.locusTrackMode !== 'off' && (
-            <LocusTopologyTrack dataset={state.dataset} mode={state.app.locusTrackMode} maxPoints={state.app.locusTrackMaxPoints} />
-          )}
-        </>
-      )}
+      {state.dataset &&
+        (state.app.locusTrackMode !== 'off' ||
+          (state.app.branchLocusTrackEnabled && selectedBranch) ||
+          (state.app.metadataTrackColumn && state.dataset.locusMetadataTable)) && (
+          <>
+            {state.app.branchLocusTrackEnabled && selectedBranch && (
+              <BranchLocusTrack
+                dataset={state.dataset}
+                branch={selectedBranch}
+                mode={state.app.locusTrackMode === 'off' ? 'chrom' : state.app.locusTrackMode}
+                maxPoints={state.app.locusTrackMaxPoints}
+              />
+            )}
+            {state.app.locusTrackMode !== 'off' && (
+              <LocusTopologyTrack dataset={state.dataset} mode={state.app.locusTrackMode} maxPoints={state.app.locusTrackMaxPoints} />
+            )}
+            {state.app.metadataTrackColumn && state.dataset.locusMetadataTable && (
+              <LocusMetadataTrack
+                dataset={state.dataset}
+                mode={state.app.locusTrackMode === 'off' ? 'chrom' : state.app.locusTrackMode}
+                maxPoints={state.app.locusTrackMaxPoints}
+                column={state.app.metadataTrackColumn}
+              />
+            )}
+          </>
+        )}
 
       <Dropzone hasDataset={!!state.dataset} dispatch={dispatch} />
       {state.loading && <LoadingOverlay />}
