@@ -66,6 +66,14 @@ gCF/bootstrap/posterior support viewer (yet). Specifically:
   clade) from *fallback* observations (a coarser enclosing clade stood in
   for it). Hover a branch to see the underlying distribution and that
   exact/fallback split.
+- **Per-locus metadata (optional)**: you can upload a TSV/CSV of arbitrary
+  per-locus values - alignment length, GC%, dN/dS, GO category,
+  chromosome, whatever you already have - alongside your gene trees,
+  joined by locus name (any row order, any subset). This app has no
+  alignment parser of its own, so any such data always has to come from
+  outside. Numeric columns render as a continuous secondary locus track;
+  categorical columns get click-to-toggle swatches, same as the topology
+  tracks (e.g. isolate loci on one chromosome by hiding the rest).
 
 The app's diagnostic value is in the second half of this list - local
 conflict patterns, taxon-movement diagnostics, and missing-vs-uninformative
@@ -80,5 +88,18 @@ The mammal CDS gene-tree sample dataset is derived from:
 > Phylogeny of Laurasiatherian Mammals: Exploring Phylogenetic Signals within
 > Coding and Noncoding Sequences. *Genome Biology and Evolution*, 9(8),
 > 1998-2012.
+
+Rebuilt directly from that paper's public data archive (not hand-edited),
+via `scripts/rebuild-mammal-dataset.ts`:
+- the sample is a reproducible random 1000-gene draw from the paper's full
+  10,259 CDS gene trees, kept as a NEXUS file with real per-gene tree names
+  (Ensembl gene ID + symbol) rather than anonymous "locus_N" names;
+- its "prebuilt reference tree" option is the paper's own real ASTRAL
+  species tree, not a reconstruction built by this app;
+- its "prebuilt metadata" option is a per-locus table (all 10,259 genes)
+  with alignment length, overall GC%, and variable/parsimony-informative
+  site counts computed directly from the alignments, plus the paper's own
+  GC3%/evolutionary-rate/resolution/completeness subset-membership labels
+  (read from its published gene lists, not recomputed).
 
 The synthetic datasets are simulated, not derived from any real study.

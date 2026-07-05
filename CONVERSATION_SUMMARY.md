@@ -183,3 +183,76 @@ things were requested and built.
   signal; the specific conflict category (concentrated/contradicted/diffuse)
   is no longer separately color-coded on the tree but remains available by
   clicking a branch. Legend updated to match.
+
+## 12. Methodology questions, and a locus-metadata feature
+
+- Asked whether the app's approach to gene-tree conflict is "easy" because
+  ILS is fundamentally different from HGT, where event placement is nearly
+  impossible - confirmed the distinction: this app never identifies *why* a
+  locus disagrees (ILS, introgression, gene-tree error, or otherwise), only
+  *that* and *how much*; HGT placement is hard specifically because it's a
+  reconciliation problem where many donor/recipient/timing scenarios can
+  produce the same observed conflict. Also asked whether bacterial
+  recombination-removal tools (Gubbins, ClonalFrameML) work similarly - yes
+  conceptually (detect where a unit of data disagrees with a reference), but
+  they scan substitution-density bursts within one alignment and then purge
+  the recombinant region to build one "clean" tree, versus this app keeping
+  every locus and reporting the full disagreement pattern.
+- Asked what metadata to add next. Recommended wiring up the already-declared-
+  but-never-populated `LocusMetadata` type (chromosome position, alignment
+  length, etc.), which turned into a larger discussion of per-locus stats
+  (alignment length, variable/parsimony-informative sites, GC content,
+  dN/dS, GO category, codon bias, bacterial factors like core-vs-accessory
+  genome) and how they'd surface in the UI. Corrected an imprecision along
+  the way: there's no set of loci that "belongs" to a branch - every locus
+  gets independently re-classified per branch, so a per-branch comparison
+  means regrouping the same fixed locus pool by its branch-specific label,
+  not selecting a subset that lives there.
+- Asked to build the upload + secondary track, with explicit requirements:
+  insist on a column-labeled table, support click-to-toggle for categorical
+  columns, and don't crowd the UI. Built a schema-flexible CSV/TSV upload
+  (first column = locus-name join key, other columns auto-typed numeric or
+  categorical) living in the "Locus tracks" toolbar dropdown, off by default
+  until a column is explicitly picked. Verified end-to-end with debug hooks
+  then removed them.
+- Asked whether it took TSV, and whether locus metadata assumes tree order or
+  supports real names. Matching was already by name (not row order); fixed
+  delimiter detection to check only the header line and prefer tab (commas
+  inside real metadata, e.g. GO term descriptions, could otherwise corrupt a
+  naive CSV split). Documented that a plain multi-tree Newick file has no way
+  to give a gene tree a real name (so it's always "locus_N" in file order),
+  while NEXUS `tree <name> = ...` statements preserve real names end-to-end.
+- Asked directly whether any of the mammal data was fake. Answered precisely:
+  the core gene trees were real (user-supplied), the "reference tree" file
+  was a real reconstruction (not fabricated) but not an authoritative species
+  tree, and a few small metadata values used only to test the upload feature
+  were fabricated for that purpose and never saved or shipped.
+
+## 13. Rebuilding the mammal dataset from its original source
+
+- Asked to explore `~/Downloads/5259829`, the paper's own data archive, to
+  understand its structure. Found: per-gene FASTA alignments, per-gene RAxML
+  trees (with real bootstrap support already on the internal nodes, plus raw
+  bootstrap-replicate trees in a separate folder), gene-subset membership
+  lists matching the paper's GC3%/rate/resolution/completeness subsets
+  exactly, and a `results/` folder with the paper's own real ASTRAL species
+  trees and concatenated ML trees per subset. Flagged that the app's Newick
+  parser already captures bootstrap values into `supportLabel` but never uses
+  them downstream, and that the real ASTRAL tree uses the same taxon names as
+  the gene trees (no translation needed) - a better reference-tree candidate
+  than the earlier half-subsample reconstruction.
+- Asked to remove the confusing existing mammal files (`testdata/lauras-cds/`,
+  the untracked full/sample tree files) and rebuild them fresh from that
+  source, decide whether individual gene trees or just the concatenated set
+  are needed, pull all available metadata into one file, and check whether
+  %-informative-sites and overall GC% were easy to compute from the
+  alignments. Built `scripts/rebuild-mammal-dataset.ts`: combines the
+  10,259 real gene trees into NEXUS files (full set + a reproducible
+  1000-gene sample) with real gene names, uses the paper's actual ASTRAL
+  tree as the reference, and computes alignment length/GC%/variable sites/
+  parsimony-informative sites directly from the alignments (confirmed easy -
+  one column-scan pass, ~1 minute for all 10,259 genes) alongside the
+  paper's own published subset-bucket labels. Wired both the reference tree
+  and the metadata table into the sample picker as opt-in checkboxes.
+  Left the full 10,259-gene set untracked (~11MB), matching how the file it
+  replaced was handled.
