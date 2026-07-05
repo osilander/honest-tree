@@ -840,6 +840,22 @@ body {
   white-space: nowrap;
 }
 
+.dropzone-sample-refcheck {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: #64748b;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dropzone-sample-refcheck input {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
 .dropzone-reftree {
   margin-top: 16px;
   padding-top: 16px;

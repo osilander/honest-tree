@@ -2,12 +2,12 @@ import { useCallback, useEffect, useRef, useState, type Dispatch } from 'react';
 import { loadDatasetFromText } from '../data/loadDataset';
 import type { Action } from '../state/store';
 
-const SAMPLE_DATASETS: { file: string; label: string }[] = [
-  { file: 'mammal-sample-all-cds.nwk', label: 'Real — mammal CDS gene trees, 22 taxa, 1000 loci' },
-  { file: 'synthetic_25taxa_500loci.nwk', label: 'Synthetic — 25 taxa, 500 loci' },
-  { file: 'synthetic_25taxa_5000loci.nwk', label: 'Synthetic — 25 taxa, 5000 loci' },
-  { file: 'synthetic_50taxa_500loci.nwk', label: 'Synthetic — 50 taxa, 500 loci' },
-  { file: 'synthetic_50taxa_5000loci.nwk', label: 'Synthetic — 50 taxa, 5000 loci' },
+const SAMPLE_DATASETS: { file: string; label: string; refFile: string }[] = [
+  { file: 'mammal-sample-all-cds.nwk', label: 'Real — mammal CDS gene trees, 22 taxa, 1000 loci', refFile: 'mammal-sample-all-cds-reference.nwk' },
+  { file: 'synthetic_25taxa_500loci.nwk', label: 'Synthetic — 25 taxa, 500 loci', refFile: 'synthetic_25taxa_500loci-reference.nwk' },
+  { file: 'synthetic_25taxa_5000loci.nwk', label: 'Synthetic — 25 taxa, 5000 loci', refFile: 'synthetic_25taxa_5000loci-reference.nwk' },
+  { file: 'synthetic_50taxa_500loci.nwk', label: 'Synthetic — 50 taxa, 500 loci', refFile: 'synthetic_50taxa_500loci-reference.nwk' },
+  { file: 'synthetic_50taxa_5000loci.nwk', label: 'Synthetic — 50 taxa, 5000 loci', refFile: 'synthetic_50taxa_5000loci-reference.nwk' },
 ];
 
 export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispatch: Dispatch<Action> }) {
@@ -15,11 +15,16 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
   const [sampleChoice, setSampleChoice] = useState(SAMPLE_DATASETS[0].file);
   const [sampleLoading, setSampleLoading] = useState(false);
   const [refTree, setRefTree] = useState<{ text: string; name: string } | null>(null);
+  const [useSampleRef, setUseSampleRef] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const refFileInputRef = useRef<HTMLInputElement | null>(null);
 
   const loadFromText = useCallback(
-    (text: string, name: string) => {
+    // refOverride === undefined means "use whatever's in the refTree state" (the
+    // manually-uploaded file, if any); pass an explicit object/null to override
+    // that for one call, e.g. when a sample's own prebuilt reference is used instead.
+    (text: string, name: string, refOverride?: { text: string; name: string } | null) => {
+      const ref = refOverride !== undefined ? refOverride : refTree;
       dispatch({ type: 'LOAD_START' });
       // loadDatasetFromText is synchronous and can block the main thread for
       // 20-30s+ on large datasets - defer it two animation frames so the
@@ -28,7 +33,7 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           try {
-            const dataset = loadDatasetFromText(text, name, refTree?.text, refTree?.name);
+            const dataset = loadDatasetFromText(text, name, ref?.text, ref?.name);
             dispatch({ type: 'LOAD_DATASET', dataset });
           } catch (e) {
             dispatch({ type: 'LOAD_ERROR', message: (e as Error).message });
@@ -58,13 +63,22 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
       const res = await fetch(`${import.meta.env.BASE_URL}sample-data/${sampleChoice}`);
       if (!res.ok) throw new Error(`Could not fetch sample dataset (${res.status})`);
       const text = await res.text();
-      loadFromText(text, sampleChoice);
+
+      const sample = SAMPLE_DATASETS.find((s) => s.file === sampleChoice);
+      if (useSampleRef && sample) {
+        const refRes = await fetch(`${import.meta.env.BASE_URL}sample-data/${sample.refFile}`);
+        if (!refRes.ok) throw new Error(`Could not fetch sample reference tree (${refRes.status})`);
+        const refText = await refRes.text();
+        loadFromText(text, sampleChoice, { text: refText, name: sample.refFile });
+      } else {
+        loadFromText(text, sampleChoice);
+      }
     } catch (e) {
       dispatch({ type: 'LOAD_ERROR', message: (e as Error).message });
     } finally {
       setSampleLoading(false);
     }
-  }, [sampleChoice, loadFromText, dispatch]);
+  }, [sampleChoice, useSampleRef, loadFromText, dispatch]);
 
   useEffect(() => {
     function onDragOver(e: DragEvent) {
@@ -121,6 +135,11 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
                 {sampleLoading ? 'Loading…' : 'Load'}
               </button>
             </div>
+            <label className="dropzone-sample-refcheck">
+              <input type="checkbox" checked={useSampleRef} onChange={(e) => setUseSampleRef(e.target.checked)} />
+              Use its prebuilt reference tree instead of the default consensus (built from a random half of its gene
+              trees - an independent, but not "true", reconstruction)
+            </label>
           </div>
           <div className="dropzone-reftree">
             <p className="dropzone-hint">
