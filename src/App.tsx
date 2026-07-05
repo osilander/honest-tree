@@ -104,6 +104,8 @@ function App() {
           ) : (
             <BranchEvidencePanel
               branch={selectedBranch}
+              dataset={state.dataset}
+              metadataColumn={state.app.metadataTrackColumn}
               missingBreakdownOpen={state.app.missingBreakdownOpen}
               onToggleMissingBreakdown={() => dispatch({ type: 'TOGGLE_MISSING_BREAKDOWN' })}
               isRerootedHere={!!selectedBranch && state.app.rerootSplitId === selectedBranch.splitId}

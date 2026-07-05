@@ -675,6 +675,50 @@ body {
   color: #334155;
 }
 
+.category-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.category-breakdown-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 34px;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.category-breakdown-label {
+  color: #334155;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.category-breakdown-bar {
+  display: flex;
+  height: 12px;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.category-breakdown-count {
+  color: #64748b;
+  text-align: right;
+}
+
+.category-breakdown-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 6px;
+  font-size: 11px;
+  color: #64748b;
+}
+
 .instability-list.missing-breakdown {
   margin-top: 4px;
   color: #64748b;

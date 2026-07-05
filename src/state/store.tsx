@@ -17,7 +17,7 @@ const initialAppState: AppState = {
   collapseWeakBranches: false,
   showTipLabels: true,
   useBranchLengths: true,
-  showConcordanceSummary: false,
+  showConcordanceSummary: true,
   matrixVisible: false,
   barcodeSort: 'input_order',
   tipLabelSize: 11,

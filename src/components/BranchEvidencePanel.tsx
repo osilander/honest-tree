@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import type { BranchRecord, TaxonInstabilityEntry } from '../types';
+import type { BranchRecord, Dataset, TaxonInstabilityEntry } from '../types';
 import { generateNaturalLanguageReport } from '../report/naturalLanguage';
 import { patternLabel, withAltRanks } from '../utils/pattern';
+import { CategoryTopologyBreakdown } from './CategoryTopologyBreakdown';
 import { EdgeHistogram } from './EdgeHistogram';
 
 function describeInstability(entry: TaxonInstabilityEntry): string {
@@ -51,6 +52,8 @@ const CONFLICT_LABELS: Record<string, string> = {
 
 export function BranchEvidencePanel({
   branch,
+  dataset,
+  metadataColumn,
   missingBreakdownOpen,
   onToggleMissingBreakdown,
   isRerootedHere,
@@ -58,6 +61,8 @@ export function BranchEvidencePanel({
   onResetRoot,
 }: {
   branch: BranchRecord | null;
+  dataset: Dataset | null;
+  metadataColumn: string | null;
   missingBreakdownOpen: boolean;
   onToggleMissingBreakdown: () => void;
   isRerootedHere: boolean;
@@ -129,6 +134,15 @@ export function BranchEvidencePanel({
         <h4>Edge histogram</h4>
         <EdgeHistogram branch={branch} />
       </section>
+
+      {dataset &&
+        metadataColumn &&
+        dataset.locusMetadataTable?.columns.find((c) => c.name === metadataColumn)?.kind === 'categorical' && (
+          <section>
+            <h4>Topology by {metadataColumn}</h4>
+            <CategoryTopologyBreakdown dataset={dataset} branch={branch} column={metadataColumn} />
+          </section>
+        )}
 
       {branch.taxonInstability.length > 0 && (
         <section>
