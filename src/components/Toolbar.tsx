@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type Dispatch, type ReactNode } from 'react';
 import type { AppState, RenderMode } from '../types';
 import type { Action } from '../state/store';
+import { TreeLegend } from './TreeLegend';
 
 const RENDER_MODES: { value: RenderMode; label: string; title: string }[] = [
   { value: 'support', label: 'Support', title: 'Width = support metric value. Color neutral - "how strongly is the reference topology supported".' },
@@ -108,6 +109,10 @@ export function Toolbar({
             Collapse weak branches
           </label>
         </div>
+      </ToolbarDropdown>
+
+      <ToolbarDropdown label="Legend">
+        <TreeLegend renderMode={appState.renderMode} />
       </ToolbarDropdown>
 
       <ToolbarDropdown label="Style">

@@ -45,10 +45,12 @@ export const CONFLICT_COLORS: Record<DominantConflict, string> = {
   missing_data: '#cbd5e1', // grey-300
 };
 
-const EVIDENCE_GREY = '#9ca3af'; // grey-400 - no/low usable evidence at all, a different qualitative state
-const EVIDENCE_GREY_CUTOFF = 0.15;
+export const EVIDENCE_GREY = '#9ca3af'; // grey-400 - no/low usable evidence at all, a different qualitative state
+export const EVIDENCE_GREY_CUTOFF = 0.15;
 const EVIDENCE_LOW = [202, 138, 4]; // yellow-600 - mostly uninformative/missing
 const EVIDENCE_HIGH = [37, 99, 235]; // blue-600 - mostly decisive (same blue as the reference pattern elsewhere)
+export const EVIDENCE_LOW_COLOR = `rgb(${EVIDENCE_LOW.join(',')})`;
+export const EVIDENCE_HIGH_COLOR = `rgb(${EVIDENCE_HIGH.join(',')})`;
 
 /**
  * Evidence mode's color channel: blue (mostly decisive) -> yellow (mostly
