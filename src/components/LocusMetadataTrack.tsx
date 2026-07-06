@@ -103,7 +103,7 @@ export function LocusMetadataTrack({ dataset, mode, maxPoints, column, branch, o
       <div className="locus-track-header">
         <button className={`locus-track-header-btn${active ? ' locus-track-header-active' : ''}`} onClick={onHeaderClick}>
           Locus metadata - {column}
-          {clickHoverHint(active, col.kind === 'numeric' ? 'sorted by value' : 'grouped by value', col.kind === 'numeric' ? 'sort by value' : 'group by value', 'values')}
+          {clickHoverHint(active, col.kind === 'numeric' ? 'sorted by value' : 'grouped by value', 'values')}
           {subsampled && ` - showing ${shown.length} of ${names.length} loci`}
         </button>
       </div>

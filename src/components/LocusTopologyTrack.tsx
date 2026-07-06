@@ -35,7 +35,7 @@ export function LocusTopologyTrack({ dataset, mode, maxPoints, metadataColumn, b
     <div className="locus-track">
       <div className="locus-track-header">
         <button className={`locus-track-header-btn${active ? ' locus-track-header-active' : ''}`} onClick={onHeaderClick}>
-          Whole-tree topology{clickHoverHint(active, 'sorted by rank', 'sort by rank', 'loci')}
+          Whole-tree topology{clickHoverHint(active, 'sorted by rank', 'loci')}
           {subsampled && ` - showing ${shown.length} of ${loci.length} loci`}
         </button>
       </div>

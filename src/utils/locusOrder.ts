@@ -75,16 +75,16 @@ export function orderedLoci(dataset: Dataset, mode: LocusSortMode, metadataColum
 }
 
 /**
- * Header hint for a track's own click-to-sort control - describes only what
- * *this* track's click does (never another track's mode), since each track
- * heading is independently clickable to make its own order the shared one.
- * When this track's mode is already the active one, describes the current
- * order and how to get back to file order; otherwise invites the click.
+ * Header hint for a track's own click-to-sort control. When this track's
+ * mode is already the active one, describes the current order and how to
+ * get back to file order; otherwise uses one generic invitation (the same
+ * wording everywhere - which specific track you're looking at, and hence
+ * what "value or topology" refers to, is already given by its own label).
  */
-export function clickHoverHint(active: boolean, activeText: string, actionText: string, hoverNoun: string): string {
+export function clickHoverHint(active: boolean, activeText: string, hoverNoun: string): string {
   return active
     ? `, ${activeText}. Click for file order, hover for individual ${hoverNoun}.`
-    : `. Click to ${actionText}, hover for individual ${hoverNoun}.`;
+    : `. Click to sort/group loci by value or topology, hover for individual ${hoverNoun}.`;
 }
 
 export function subsample<T>(items: T[], maxPoints: number | null): T[] {

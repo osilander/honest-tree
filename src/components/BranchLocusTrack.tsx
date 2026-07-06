@@ -61,7 +61,7 @@ export function BranchLocusTrack({ dataset, branch, mode, maxPoints, metadataCol
     <div className="locus-track">
       <div className="locus-track-header">
         <button className={`locus-track-header-btn${active ? ' locus-track-header-active' : ''}`} onClick={onHeaderClick}>
-          {branch.branchId} topology{clickHoverHint(active, "grouped by this branch's pattern", "group by this branch's pattern", 'loci')}
+          {branch.branchId} topology{clickHoverHint(active, "grouped by this branch's pattern", 'loci')}
           {subsampled && ` - showing ${shown.length} of ${names.length} loci`}
         </button>
       </div>
