@@ -23,14 +23,14 @@ const initialAppState: AppState = {
   tipLabelSize: 11,
   branchWidthScale: 1,
   showSupportValues: false,
-  topologyTrackMode: 'chrom',
+  topologyTrackEnabled: true,
+  locusSortMode: 'chrom',
   locusTrackMaxPoints: null,
   branchLocusTrackEnabled: true,
-  branchTrackMode: 'chrom',
-  metadataTrackOrder: 'chrom',
   taxonSampleMode: 'off',
   taxonSampleCount: 15,
   taxonSampleSeed: 0,
+  taxonSampleCustomSet: [],
   rerootSplitId: null,
   searchTaxon: null,
   missingBreakdownOpen: false,
@@ -60,14 +60,15 @@ export type Action =
   | { type: 'SET_TIP_LABEL_SIZE'; value: number }
   | { type: 'SET_BRANCH_WIDTH_SCALE'; value: number }
   | { type: 'TOGGLE_SUPPORT_VALUES' }
-  | { type: 'SET_TOPOLOGY_TRACK_MODE'; mode: 'off' | 'chrom' | 'sorted' | 'metadata' }
+  | { type: 'SET_TOPOLOGY_TRACK_ENABLED'; value: boolean }
+  | { type: 'SET_LOCUS_SORT_MODE'; mode: 'chrom' | 'rank' | 'metadata' | 'branchPattern' }
   | { type: 'SET_LOCUS_TRACK_MAX_POINTS'; value: number | null }
   | { type: 'SET_BRANCH_LOCUS_TRACK_ENABLED'; value: boolean }
-  | { type: 'SET_BRANCH_TRACK_MODE'; mode: 'chrom' | 'sorted' | 'metadata' | 'pattern' }
-  | { type: 'SET_METADATA_TRACK_ORDER'; mode: 'chrom' | 'sorted' | 'metadata' }
-  | { type: 'SET_TAXON_SAMPLE_MODE'; mode: 'off' | 'random' | 'diverged' }
+  | { type: 'SET_TAXON_SAMPLE_MODE'; mode: 'off' | 'random' | 'diverged' | 'custom' }
   | { type: 'SET_TAXON_SAMPLE_COUNT'; value: number }
   | { type: 'RESAMPLE_TAXA' }
+  | { type: 'TOGGLE_CUSTOM_TAXON'; taxon: string }
+  | { type: 'SET_CUSTOM_TAXA'; taxa: string[] }
   | { type: 'SET_SEARCH_TAXON'; taxon: string | null }
   | { type: 'TOGGLE_MISSING_BREAKDOWN' }
   | { type: 'SET_REROOT_SPLIT'; splitId: string | null }
@@ -106,22 +107,28 @@ function reducer(state: StoreState, action: Action): StoreState {
       return { ...state, app: { ...state.app, branchWidthScale: action.value } };
     case 'TOGGLE_SUPPORT_VALUES':
       return { ...state, app: { ...state.app, showSupportValues: !state.app.showSupportValues } };
-    case 'SET_TOPOLOGY_TRACK_MODE':
-      return { ...state, app: { ...state.app, topologyTrackMode: action.mode } };
+    case 'SET_TOPOLOGY_TRACK_ENABLED':
+      return { ...state, app: { ...state.app, topologyTrackEnabled: action.value } };
+    case 'SET_LOCUS_SORT_MODE':
+      return { ...state, app: { ...state.app, locusSortMode: action.mode } };
     case 'SET_LOCUS_TRACK_MAX_POINTS':
       return { ...state, app: { ...state.app, locusTrackMaxPoints: action.value } };
     case 'SET_BRANCH_LOCUS_TRACK_ENABLED':
       return { ...state, app: { ...state.app, branchLocusTrackEnabled: action.value } };
-    case 'SET_BRANCH_TRACK_MODE':
-      return { ...state, app: { ...state.app, branchTrackMode: action.mode } };
-    case 'SET_METADATA_TRACK_ORDER':
-      return { ...state, app: { ...state.app, metadataTrackOrder: action.mode } };
     case 'SET_TAXON_SAMPLE_MODE':
       return { ...state, app: { ...state.app, taxonSampleMode: action.mode } };
     case 'SET_TAXON_SAMPLE_COUNT':
       return { ...state, app: { ...state.app, taxonSampleCount: action.value } };
     case 'RESAMPLE_TAXA':
       return { ...state, app: { ...state.app, taxonSampleSeed: state.app.taxonSampleSeed + 1 } };
+    case 'TOGGLE_CUSTOM_TAXON': {
+      const set = new Set(state.app.taxonSampleCustomSet);
+      if (set.has(action.taxon)) set.delete(action.taxon);
+      else set.add(action.taxon);
+      return { ...state, app: { ...state.app, taxonSampleCustomSet: [...set] } };
+    }
+    case 'SET_CUSTOM_TAXA':
+      return { ...state, app: { ...state.app, taxonSampleCustomSet: action.taxa } };
     case 'SET_SEARCH_TAXON':
       return { ...state, app: { ...state.app, searchTaxon: action.taxon } };
     case 'TOGGLE_MISSING_BREAKDOWN':

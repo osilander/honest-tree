@@ -81,9 +81,15 @@ export const HonestTree = forwardRef<HonestTreeHandle, HonestTreeProps>(function
   }, [rerootedRoot, dataset, appState.collapseWeakBranches, appState.supportMetric, appState.threshold]);
 
   const sampledTaxa = useMemo(
-    () => pickSampledTaxa(dataset, appState.taxonSampleMode, appState.taxonSampleCount),
+    () =>
+      pickSampledTaxa(
+        dataset,
+        appState.taxonSampleMode,
+        appState.taxonSampleCount,
+        appState.taxonSampleMode === 'custom' ? new Set(appState.taxonSampleCustomSet) : undefined,
+      ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dataset, appState.taxonSampleMode, appState.taxonSampleCount, appState.taxonSampleSeed],
+    [dataset, appState.taxonSampleMode, appState.taxonSampleCount, appState.taxonSampleSeed, appState.taxonSampleCustomSet],
   );
 
   // Taxa removed here are only hidden from this rendering - recomputing

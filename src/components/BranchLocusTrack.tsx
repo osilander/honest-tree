@@ -1,40 +1,20 @@
 import { useState } from 'react';
 import type { BranchRecord, Dataset } from '../types';
 import { HIDDEN_COLOR, MISSING_COLOR, OTHER_COLOR, UNINFORMATIVE_COLOR } from '../utils/color';
-import { orderLabel, orderedLoci, subsample, type LocusOrderMode } from '../utils/locusOrder';
+import { orderLabel, orderedLoci, subsample, type LocusSortMode } from '../utils/locusOrder';
 import { patternColor, patternLabel, patternTag, withAltRanks } from '../utils/pattern';
-
-export type BranchTrackMode = LocusOrderMode | 'pattern';
 
 interface BranchLocusTrackProps {
   dataset: Dataset;
   branch: BranchRecord;
-  mode: BranchTrackMode;
+  mode: LocusSortMode;
   maxPoints: number | null;
   metadataColumn: string | null;
 }
 
 export function BranchLocusTrack({ dataset, branch, mode, maxPoints, metadataColumn }: BranchLocusTrackProps) {
   const ranked = withAltRanks(branch.topologyPatterns);
-  const groupByPattern = mode === 'pattern';
-  const baseMode: LocusOrderMode = mode === 'pattern' ? 'chrom' : mode;
-  const baseNames = orderedLoci(dataset, baseMode, metadataColumn);
-
-  // Optionally group loci by this branch's own classification (reference,
-  // then each alternative by rank, then other/uninformative/missing) -
-  // ties broken by the base order above (stable sort), so within a group
-  // loci still follow whatever chrom/rank/metadata order was chosen.
-  const groupOrder = [...branch.topologyPatterns.map((p) => p.key), 'uninformative', 'missing'];
-  const groupRank = new Map(groupOrder.map((k, i) => [k, i]));
-  const groupKeyFor = (name: string): string => {
-    const key = branch.locusPatternKey[name] ?? 'missing';
-    if (key === 'missing' || key === 'uninformative') return key;
-    return ranked.some((r) => r.pattern.key === key) ? key : 'other';
-  };
-  const names = groupByPattern
-    ? [...baseNames].sort((a, b) => (groupRank.get(groupKeyFor(a)) ?? Infinity) - (groupRank.get(groupKeyFor(b)) ?? Infinity))
-    : baseNames;
-
+  const names = orderedLoci(dataset, mode, metadataColumn, branch);
   const shown = subsample(names, maxPoints);
   const total = shown.length || 1;
   const subsampled = shown.length < names.length;
@@ -79,7 +59,7 @@ export function BranchLocusTrack({ dataset, branch, mode, maxPoints, metadataCol
     <div className="locus-track">
       <div className="locus-track-header">
         <span className="toolbar-label">
-          {branch.branchId} topology, {mode === 'pattern' ? 'grouped by this branch’s pattern' : orderLabel(mode, metadataColumn)}
+          {branch.branchId} topology, {orderLabel(mode, metadataColumn, true)}
           {subsampled && ` - showing ${shown.length} of ${names.length} loci`}
         </span>
       </div>

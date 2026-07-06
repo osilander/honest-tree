@@ -198,116 +198,89 @@ export function Toolbar({
 
       <ToolbarDropdown label="Locus tracks">
         <div className="toolbar-group">
-          <span className="toolbar-label">Locus topology track</span>
-          <div className="radio-row">
-            <label className="radio-option">
+          <span className="toolbar-label">Tracks shown</span>
+          <div className="toolbar-checks">
+            <label className="checkbox-option">
               <input
-                type="radio"
-                name="topologyTrackMode"
-                checked={appState.topologyTrackMode === 'off'}
-                onChange={() => dispatch({ type: 'SET_TOPOLOGY_TRACK_MODE', mode: 'off' })}
+                type="checkbox"
+                checked={appState.topologyTrackEnabled}
+                onChange={(e) => dispatch({ type: 'SET_TOPOLOGY_TRACK_ENABLED', value: e.target.checked })}
               />
-              Off
+              Whole-tree topology
             </label>
-            <label className="radio-option">
+            <label className="checkbox-option">
               <input
-                type="radio"
-                name="topologyTrackMode"
-                checked={appState.topologyTrackMode === 'chrom'}
-                onChange={() => dispatch({ type: 'SET_TOPOLOGY_TRACK_MODE', mode: 'chrom' })}
+                type="checkbox"
+                checked={appState.branchLocusTrackEnabled}
+                onChange={(e) => dispatch({ type: 'SET_BRANCH_LOCUS_TRACK_ENABLED', value: e.target.checked })}
               />
-              Chromosome order
+              Branch topology (selected branch)
             </label>
-            <label className="radio-option">
-              <input
-                type="radio"
-                name="topologyTrackMode"
-                checked={appState.topologyTrackMode === 'sorted'}
-                onChange={() => dispatch({ type: 'SET_TOPOLOGY_TRACK_MODE', mode: 'sorted' })}
-              />
-              Sorted by rank
-            </label>
-            {appState.metadataTrackColumn && (
-              <label className="radio-option" title={`Sort by ${appState.metadataTrackColumn} - numeric columns ascending, categorical columns grouped by most common first.`}>
+            {metadataTable && (
+              <label className="checkbox-option">
                 <input
-                  type="radio"
-                  name="topologyTrackMode"
-                  checked={appState.topologyTrackMode === 'metadata'}
-                  onChange={() => dispatch({ type: 'SET_TOPOLOGY_TRACK_MODE', mode: 'metadata' })}
+                  type="checkbox"
+                  checked={!!appState.metadataTrackColumn}
+                  onChange={(e) =>
+                    dispatch({
+                      type: 'SET_METADATA_TRACK_COLUMN',
+                      column: e.target.checked ? (appState.metadataTrackColumn ?? metadataTable.columns[0]?.name ?? null) : null,
+                    })
+                  }
                 />
-                Sorted by {appState.metadataTrackColumn}
+                {appState.metadataTrackColumn ?? 'Metadata'}
               </label>
             )}
           </div>
         </div>
 
         <div className="toolbar-group">
-          <span className="toolbar-label">Branch topology track</span>
+          <span className="toolbar-label">Sort all shown tracks by</span>
           <div className="radio-row">
             <label className="radio-option">
               <input
                 type="radio"
-                name="branchLocusTrackEnabled"
-                checked={appState.branchLocusTrackEnabled}
-                onChange={() => dispatch({ type: 'SET_BRANCH_LOCUS_TRACK_ENABLED', value: true })}
+                name="locusSortMode"
+                checked={appState.locusSortMode === 'chrom'}
+                onChange={() => dispatch({ type: 'SET_LOCUS_SORT_MODE', mode: 'chrom' })}
               />
-              On
+              Chromosome order
             </label>
-            <label className="radio-option">
+            <label className="radio-option" title="Rank by frequency of the whole-tree topology each locus displays.">
               <input
                 type="radio"
-                name="branchLocusTrackEnabled"
-                checked={!appState.branchLocusTrackEnabled}
-                onChange={() => dispatch({ type: 'SET_BRANCH_LOCUS_TRACK_ENABLED', value: false })}
+                name="locusSortMode"
+                checked={appState.locusSortMode === 'rank'}
+                onChange={() => dispatch({ type: 'SET_LOCUS_SORT_MODE', mode: 'rank' })}
               />
-              Off
+              Whole-tree topology rank
             </label>
+            {appState.selectedBranchId && (
+              <label className="radio-option" title="Group by the selected branch's own classification: reference, then each alternative, then uninformative/missing.">
+                <input
+                  type="radio"
+                  name="locusSortMode"
+                  checked={appState.locusSortMode === 'branchPattern'}
+                  onChange={() => dispatch({ type: 'SET_LOCUS_SORT_MODE', mode: 'branchPattern' })}
+                />
+                Branch topology
+              </label>
+            )}
+            {appState.metadataTrackColumn && (
+              <label className="radio-option" title={`Sort by ${appState.metadataTrackColumn} - numeric columns ascending, categorical columns grouped by most common first.`}>
+                <input
+                  type="radio"
+                  name="locusSortMode"
+                  checked={appState.locusSortMode === 'metadata'}
+                  onChange={() => dispatch({ type: 'SET_LOCUS_SORT_MODE', mode: 'metadata' })}
+                />
+                {appState.metadataTrackColumn} value
+              </label>
+            )}
           </div>
-          {appState.branchLocusTrackEnabled && (
-            <div className="radio-row">
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="branchTrackMode"
-                  checked={appState.branchTrackMode === 'chrom'}
-                  onChange={() => dispatch({ type: 'SET_BRANCH_TRACK_MODE', mode: 'chrom' })}
-                />
-                Chromosome order
-              </label>
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="branchTrackMode"
-                  checked={appState.branchTrackMode === 'sorted'}
-                  onChange={() => dispatch({ type: 'SET_BRANCH_TRACK_MODE', mode: 'sorted' })}
-                />
-                Sorted by rank
-              </label>
-              {appState.metadataTrackColumn && (
-                <label className="radio-option" title={`Sort by ${appState.metadataTrackColumn}.`}>
-                  <input
-                    type="radio"
-                    name="branchTrackMode"
-                    checked={appState.branchTrackMode === 'metadata'}
-                    onChange={() => dispatch({ type: 'SET_BRANCH_TRACK_MODE', mode: 'metadata' })}
-                  />
-                  Sorted by {appState.metadataTrackColumn}
-                </label>
-              )}
-              <label className="radio-option" title="Group this branch's loci by reference/alternative/uninformative/missing instead of a dataset-wide order.">
-                <input
-                  type="radio"
-                  name="branchTrackMode"
-                  checked={appState.branchTrackMode === 'pattern'}
-                  onChange={() => dispatch({ type: 'SET_BRANCH_TRACK_MODE', mode: 'pattern' })}
-                />
-                Grouped by this branch's pattern
-              </label>
-            </div>
-          )}
         </div>
 
-        {(appState.topologyTrackMode !== 'off' || appState.branchLocusTrackEnabled || appState.metadataTrackColumn) && (
+        {(appState.topologyTrackEnabled || appState.branchLocusTrackEnabled || appState.metadataTrackColumn) && (
           <div className="toolbar-group">
             <span className="toolbar-label">Track resolution</span>
             <select
@@ -362,37 +335,6 @@ export function Toolbar({
                   </option>
                 ))}
               </select>
-              {appState.metadataTrackColumn && (
-                <div className="radio-row">
-                  <label className="radio-option">
-                    <input
-                      type="radio"
-                      name="metadataTrackOrder"
-                      checked={appState.metadataTrackOrder === 'chrom'}
-                      onChange={() => dispatch({ type: 'SET_METADATA_TRACK_ORDER', mode: 'chrom' })}
-                    />
-                    Chromosome order
-                  </label>
-                  <label className="radio-option">
-                    <input
-                      type="radio"
-                      name="metadataTrackOrder"
-                      checked={appState.metadataTrackOrder === 'sorted'}
-                      onChange={() => dispatch({ type: 'SET_METADATA_TRACK_ORDER', mode: 'sorted' })}
-                    />
-                    Sorted by rank
-                  </label>
-                  <label className="radio-option" title={`Sort by this column's own value.`}>
-                    <input
-                      type="radio"
-                      name="metadataTrackOrder"
-                      checked={appState.metadataTrackOrder === 'metadata'}
-                      onChange={() => dispatch({ type: 'SET_METADATA_TRACK_ORDER', mode: 'metadata' })}
-                    />
-                    Sorted by its own value
-                  </label>
-                </div>
-              )}
             </>
           )}
         </div>
@@ -432,10 +374,19 @@ export function Toolbar({
               />
               Most diverged
             </label>
+            <label className="radio-option" title="Pick specific taxa by name instead of a count-based rule.">
+              <input
+                type="radio"
+                name="taxonSampleMode"
+                checked={appState.taxonSampleMode === 'custom'}
+                onChange={() => dispatch({ type: 'SET_TAXON_SAMPLE_MODE', mode: 'custom' })}
+              />
+              Select taxa to include
+            </label>
           </div>
         </div>
 
-        {appState.taxonSampleMode !== 'off' && (
+        {appState.taxonSampleMode !== 'off' && appState.taxonSampleMode !== 'custom' && (
           <div className="toolbar-group">
             <span className="toolbar-label">Taxa to show</span>
             <div className="radio-row">
@@ -457,6 +408,36 @@ export function Toolbar({
                   Resample
                 </button>
               )}
+            </div>
+          </div>
+        )}
+
+        {appState.taxonSampleMode === 'custom' && (
+          <div className="toolbar-group">
+            <span className="toolbar-label">
+              Taxa to include ({appState.taxonSampleCustomSet.length} of {taxa.length})
+            </span>
+            <div className="radio-row">
+              <button className="reset-view-btn" onClick={() => dispatch({ type: 'SET_CUSTOM_TAXA', taxa: [...taxa] })}>
+                Select all
+              </button>
+              <button className="reset-view-btn" onClick={() => dispatch({ type: 'SET_CUSTOM_TAXA', taxa: [] })}>
+                Clear
+              </button>
+            </div>
+            <div className="taxon-checklist">
+              {[...taxa]
+                .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+                .map((t) => (
+                  <label key={t} className="checkbox-option">
+                    <input
+                      type="checkbox"
+                      checked={appState.taxonSampleCustomSet.includes(t)}
+                      onChange={() => dispatch({ type: 'TOGGLE_CUSTOM_TAXON', taxon: t })}
+                    />
+                    {t}
+                  </label>
+                ))}
             </div>
           </div>
         )}

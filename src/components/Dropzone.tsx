@@ -6,7 +6,7 @@ import type { Action } from '../state/store';
 const SAMPLE_DATASETS: { file: string; label: string; refFile: string; metadataFile?: string }[] = [
   {
     file: 'mammal-sample-all-cds.nex',
-    label: 'Real — mammal CDS gene trees, 22 taxa, 1000 loci',
+    label: 'Chen et al. (2017) Laurasiatheria — 22 taxa, 1000 loci',
     refFile: 'mammal-sample-all-cds-reference.nwk',
     metadataFile: 'mammal-cds-locus-metadata.tsv',
   },

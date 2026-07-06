@@ -179,17 +179,25 @@ export interface AppState {
   tipLabelSize: number;
   branchWidthScale: number;
   showSupportValues: boolean;
-  /** Visibility + order for the global (whole-tree) locus topology track. 'off' hides it entirely. */
-  topologyTrackMode: 'off' | 'chrom' | 'sorted' | 'metadata';
+  /** Visibility of the global (whole-tree) locus topology track. */
+  topologyTrackEnabled: boolean;
+  /**
+   * Shared sort order applied to every currently-visible locus track (whole-
+   * tree topology, per-branch topology, metadata) - one choice for all of
+   * them, so "what order are things in" is a single answer. 'branchPattern'
+   * groups loci by the selected branch's own classification (reference/alt/
+   * uninformative/missing); falls back to chrom order when no branch is
+   * selected. 'metadata' needs a metadata column selected; falls back to
+   * chrom order otherwise.
+   */
+  locusSortMode: 'chrom' | 'rank' | 'metadata' | 'branchPattern';
   locusTrackMaxPoints: number | null;
   branchLocusTrackEnabled: boolean;
-  /** Order for the per-branch topology track (visibility is branchLocusTrackEnabled). 'pattern' groups by this branch's own classification (reference/alt/uninformative/missing) instead of a dataset-wide order. */
-  branchTrackMode: 'chrom' | 'sorted' | 'metadata' | 'pattern';
-  /** Order for the locus metadata track (visibility is metadataTrackColumn !== null). */
-  metadataTrackOrder: 'chrom' | 'sorted' | 'metadata';
-  taxonSampleMode: 'off' | 'random' | 'diverged';
+  taxonSampleMode: 'off' | 'random' | 'diverged' | 'custom';
   taxonSampleCount: number;
   taxonSampleSeed: number;
+  /** Explicitly selected taxa for taxonSampleMode === 'custom'. */
+  taxonSampleCustomSet: string[];
   rerootSplitId: string | null;
   searchTaxon: string | null;
   missingBreakdownOpen: boolean;

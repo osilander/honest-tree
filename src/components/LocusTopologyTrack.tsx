@@ -1,19 +1,20 @@
 import { useState } from 'react';
-import type { Dataset } from '../types';
+import type { BranchRecord, Dataset } from '../types';
 import { HIDDEN_COLOR, topologyRankColor } from '../utils/color';
-import { orderLabel, orderedLoci, subsample, type LocusOrderMode } from '../utils/locusOrder';
+import { orderLabel, orderedLoci, subsample, type LocusSortMode } from '../utils/locusOrder';
 
 interface LocusTopologyTrackProps {
   dataset: Dataset;
-  mode: LocusOrderMode;
+  mode: LocusSortMode;
   maxPoints: number | null;
   metadataColumn: string | null;
+  branch: BranchRecord | null;
 }
 
-export function LocusTopologyTrack({ dataset, mode, maxPoints, metadataColumn }: LocusTopologyTrackProps) {
+export function LocusTopologyTrack({ dataset, mode, maxPoints, metadataColumn, branch }: LocusTopologyTrackProps) {
   const { locusRank, ranks, maxNamedRank } = dataset.topologyRanking;
   const [hiddenRanks, setHiddenRanks] = useState<Set<number>>(new Set());
-  const names = orderedLoci(dataset, mode, metadataColumn);
+  const names = orderedLoci(dataset, mode, metadataColumn, branch);
   const loci = names.map((name) => ({ name, rank: locusRank.get(name)! }));
 
   const shown = subsample(loci, maxPoints);
@@ -32,7 +33,7 @@ export function LocusTopologyTrack({ dataset, mode, maxPoints, metadataColumn }:
     <div className="locus-track">
       <div className="locus-track-header">
         <span className="toolbar-label">
-          Locus topology, {orderLabel(mode, metadataColumn)}
+          Locus topology, {orderLabel(mode, metadataColumn, !!branch)}
           {subsampled && ` - showing ${shown.length} of ${loci.length} loci`}
         </span>
       </div>

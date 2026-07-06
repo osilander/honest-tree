@@ -1,18 +1,19 @@
 import { useMemo, useState } from 'react';
-import type { Dataset } from '../types';
+import type { BranchRecord, Dataset } from '../types';
 import { HIDDEN_COLOR, METADATA_HIGH_COLOR, METADATA_LOW_COLOR, METADATA_NO_DATA_COLOR, metadataCategoricalColor, metadataNumericColor } from '../utils/color';
-import { orderLabel, orderedLoci, subsample, type LocusOrderMode } from '../utils/locusOrder';
+import { orderLabel, orderedLoci, subsample, type LocusSortMode } from '../utils/locusOrder';
 
 interface LocusMetadataTrackProps {
   dataset: Dataset;
-  mode: LocusOrderMode;
+  mode: LocusSortMode;
   maxPoints: number | null;
   column: string;
+  branch: BranchRecord | null;
 }
 
-export function LocusMetadataTrack({ dataset, mode, maxPoints, column }: LocusMetadataTrackProps) {
+export function LocusMetadataTrack({ dataset, mode, maxPoints, column, branch }: LocusMetadataTrackProps) {
   const table = dataset.locusMetadataTable;
-  const names = orderedLoci(dataset, mode, column);
+  const names = orderedLoci(dataset, mode, column, branch);
   const shown = subsample(names, maxPoints);
   const total = shown.length || 1;
   const subsampled = shown.length < names.length;
@@ -83,7 +84,7 @@ export function LocusMetadataTrack({ dataset, mode, maxPoints, column }: LocusMe
     <div className="locus-track">
       <div className="locus-track-header">
         <span className="toolbar-label">
-          Locus metadata - {column}, {orderLabel(mode, column)}
+          Locus metadata - {column}, {orderLabel(mode, column, !!branch)}
           {subsampled && ` - showing ${shown.length} of ${names.length} loci`}
         </span>
       </div>

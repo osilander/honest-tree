@@ -2,7 +2,7 @@ import type { Dataset, RawNode } from '../types';
 import { annotateMasks, splitIdFor, type TaxonIndex } from './splits';
 import { popcount } from './bitset';
 
-export type TaxonSampleMode = 'off' | 'random' | 'diverged';
+export type TaxonSampleMode = 'off' | 'random' | 'diverged' | 'custom';
 
 function terminalBranchLengths(root: RawNode): Map<string, number> {
   const out = new Map<string, number>();
@@ -18,11 +18,19 @@ function terminalBranchLengths(root: RawNode): Map<string, number> {
  * terminal (pendant) branch length - taxa on a long branch are phylogenetically
  * distinct and worth seeing; taxa on a very short branch are near-duplicates
  * of a neighbor and safe to drop first. 'random' is a uniform draw, useful as
- * an unbiased sanity check against the 'diverged' selection.
+ * an unbiased sanity check against the 'diverged' selection. 'custom' is an
+ * explicit user-picked set, ignoring `count`.
  */
-export function pickSampledTaxa(dataset: Dataset, mode: TaxonSampleMode, count: number): string[] {
+export function pickSampledTaxa(dataset: Dataset, mode: TaxonSampleMode, count: number, customSet?: Set<string>): string[] {
   const all = dataset.taxa;
-  if (mode === 'off' || count >= all.length) return all;
+  if (mode === 'off') return all;
+
+  if (mode === 'custom') {
+    const kept = all.filter((t) => customSet?.has(t));
+    return kept.length > 0 ? kept : all;
+  }
+
+  if (count >= all.length) return all;
 
   if (mode === 'random') {
     const shuffled = [...all];
