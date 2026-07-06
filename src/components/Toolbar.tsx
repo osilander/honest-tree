@@ -234,54 +234,12 @@ export function Toolbar({
           </div>
         </div>
 
-        <div className="toolbar-group">
-          <span className="toolbar-label">Sort all shown tracks by</span>
-          <div className="radio-row">
-            <label
-              className="radio-option"
-              title='The order loci appear in the input tree file. If that file does not encode real chromosome/genomic position, this is not actually chromosomal order - just file order, assumed to reflect it when no positional data is present.'
-            >
-              <input
-                type="radio"
-                name="locusSortMode"
-                checked={appState.locusSortMode === 'chrom'}
-                onChange={() => dispatch({ type: 'SET_LOCUS_SORT_MODE', mode: 'chrom' })}
-              />
-              File order
-            </label>
-            <label className="radio-option" title="Rank by frequency of the whole-tree topology each locus displays.">
-              <input
-                type="radio"
-                name="locusSortMode"
-                checked={appState.locusSortMode === 'rank'}
-                onChange={() => dispatch({ type: 'SET_LOCUS_SORT_MODE', mode: 'rank' })}
-              />
-              Whole-tree topology rank
-            </label>
-            {appState.selectedBranchId && (
-              <label className="radio-option" title="Group by the selected branch's own classification: reference, then each alternative, then uninformative/missing.">
-                <input
-                  type="radio"
-                  name="locusSortMode"
-                  checked={appState.locusSortMode === 'branchPattern'}
-                  onChange={() => dispatch({ type: 'SET_LOCUS_SORT_MODE', mode: 'branchPattern' })}
-                />
-                Branch topology
-              </label>
-            )}
-            {appState.metadataTrackColumn && (
-              <label className="radio-option" title={`Sort by ${appState.metadataTrackColumn} - numeric columns ascending, categorical columns grouped by most common first.`}>
-                <input
-                  type="radio"
-                  name="locusSortMode"
-                  checked={appState.locusSortMode === 'metadata'}
-                  onChange={() => dispatch({ type: 'SET_LOCUS_SORT_MODE', mode: 'metadata' })}
-                />
-                {appState.metadataTrackColumn} value
-              </label>
-            )}
-          </div>
-        </div>
+        {(appState.topologyTrackEnabled || appState.branchLocusTrackEnabled || appState.metadataTrackColumn) && (
+          <p className="dropzone-hint toolbar-metadata-hint">
+            Each locus track's own heading is clickable: click it to sort every shown track by that one; click again for
+            file order.
+          </p>
+        )}
 
         {(appState.topologyTrackEnabled || appState.branchLocusTrackEnabled || appState.metadataTrackColumn) && (
           <div className="toolbar-group">

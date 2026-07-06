@@ -74,12 +74,17 @@ export function orderedLoci(dataset: Dataset, mode: LocusSortMode, metadataColum
   return names;
 }
 
-/** Human-readable description of the current locus order, for track headers. */
-export function orderLabel(mode: LocusSortMode, metadataColumn?: string | null, hasBranch?: boolean): string {
-  if (mode === 'branchPattern' && hasBranch) return "grouped by this branch's pattern";
-  if (mode === 'metadata' && metadataColumn) return `sorted by ${metadataColumn}`;
-  if (mode === 'rank') return 'sorted by rank';
-  return 'file order';
+/**
+ * Header hint for a track's own click-to-sort control - describes only what
+ * *this* track's click does (never another track's mode), since each track
+ * heading is independently clickable to make its own order the shared one.
+ * When this track's mode is already the active one, describes the current
+ * order and how to get back to file order; otherwise invites the click.
+ */
+export function clickHoverHint(active: boolean, activeText: string, actionText: string, hoverNoun: string): string {
+  return active
+    ? `, ${activeText}. Click for file order, hover for individual ${hoverNoun}.`
+    : `. Click to ${actionText}, hover for individual ${hoverNoun}.`;
 }
 
 export function subsample<T>(items: T[], maxPoints: number | null): T[] {

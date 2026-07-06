@@ -372,6 +372,30 @@ body {
   margin-bottom: 4px;
 }
 
+.locus-track-header-btn {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.locus-track-header-btn:hover {
+  color: #334155;
+  text-decoration: underline;
+}
+
+.locus-track-header-active {
+  color: #4338ca;
+  font-weight: 600;
+}
+
 .locus-track-svg {
   display: block;
   border-radius: 3px;

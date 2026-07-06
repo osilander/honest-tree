@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { BranchRecord, Dataset } from '../types';
 import { HIDDEN_COLOR, METADATA_HIGH_COLOR, METADATA_LOW_COLOR, METADATA_NO_DATA_COLOR, metadataCategoricalColor, metadataNumericColor } from '../utils/color';
-import { orderLabel, orderedLoci, subsample, type LocusSortMode } from '../utils/locusOrder';
+import { clickHoverHint, orderedLoci, subsample, type LocusSortMode } from '../utils/locusOrder';
 
 interface LocusMetadataTrackProps {
   dataset: Dataset;
@@ -9,14 +9,16 @@ interface LocusMetadataTrackProps {
   maxPoints: number | null;
   column: string;
   branch: BranchRecord | null;
+  onHeaderClick: () => void;
 }
 
-export function LocusMetadataTrack({ dataset, mode, maxPoints, column, branch }: LocusMetadataTrackProps) {
+export function LocusMetadataTrack({ dataset, mode, maxPoints, column, branch, onHeaderClick }: LocusMetadataTrackProps) {
   const table = dataset.locusMetadataTable;
   const names = orderedLoci(dataset, mode, column, branch);
   const shown = subsample(names, maxPoints);
   const total = shown.length || 1;
   const subsampled = shown.length < names.length;
+  const active = mode === 'metadata';
   const [hiddenCategories, setHiddenCategories] = useState<Set<string>>(new Set());
 
   const col = table?.columns.find((c) => c.name === column);
@@ -83,10 +85,11 @@ export function LocusMetadataTrack({ dataset, mode, maxPoints, column, branch }:
   return (
     <div className="locus-track">
       <div className="locus-track-header">
-        <span className="toolbar-label">
-          Locus metadata - {column}, {orderLabel(mode, column, !!branch)}
+        <button className={`locus-track-header-btn${active ? ' locus-track-header-active' : ''}`} onClick={onHeaderClick}>
+          Locus metadata - {column}
+          {clickHoverHint(active, col.kind === 'numeric' ? 'sorted by value' : 'grouped by value', col.kind === 'numeric' ? 'sort by value' : 'group by value', 'values')}
           {subsampled && ` - showing ${shown.length} of ${names.length} loci`}
-        </span>
+        </button>
       </div>
       <svg viewBox={`0 0 ${total} 1`} preserveAspectRatio="none" width="100%" height="18" className="locus-track-svg">
         {shown.map((name, i) => (

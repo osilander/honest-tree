@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { BranchRecord, Dataset } from '../types';
 import { HIDDEN_COLOR, topologyRankColor } from '../utils/color';
-import { orderLabel, orderedLoci, subsample, type LocusSortMode } from '../utils/locusOrder';
+import { clickHoverHint, orderedLoci, subsample, type LocusSortMode } from '../utils/locusOrder';
 
 interface LocusTopologyTrackProps {
   dataset: Dataset;
@@ -9,9 +9,10 @@ interface LocusTopologyTrackProps {
   maxPoints: number | null;
   metadataColumn: string | null;
   branch: BranchRecord | null;
+  onHeaderClick: () => void;
 }
 
-export function LocusTopologyTrack({ dataset, mode, maxPoints, metadataColumn, branch }: LocusTopologyTrackProps) {
+export function LocusTopologyTrack({ dataset, mode, maxPoints, metadataColumn, branch, onHeaderClick }: LocusTopologyTrackProps) {
   const { locusRank, ranks, maxNamedRank } = dataset.topologyRanking;
   const [hiddenRanks, setHiddenRanks] = useState<Set<number>>(new Set());
   const names = orderedLoci(dataset, mode, metadataColumn, branch);
@@ -20,6 +21,7 @@ export function LocusTopologyTrack({ dataset, mode, maxPoints, metadataColumn, b
   const shown = subsample(loci, maxPoints);
   const total = shown.length || 1;
   const subsampled = shown.length < loci.length;
+  const active = mode === 'rank';
 
   const toggleRank = (rank: number) =>
     setHiddenRanks((prev) => {
@@ -32,10 +34,10 @@ export function LocusTopologyTrack({ dataset, mode, maxPoints, metadataColumn, b
   return (
     <div className="locus-track">
       <div className="locus-track-header">
-        <span className="toolbar-label">
-          Whole-tree topology, {orderLabel(mode, metadataColumn, !!branch)}
+        <button className={`locus-track-header-btn${active ? ' locus-track-header-active' : ''}`} onClick={onHeaderClick}>
+          Whole-tree topology{clickHoverHint(active, 'sorted by rank', 'sort by rank', 'loci')}
           {subsampled && ` - showing ${shown.length} of ${loci.length} loci`}
-        </span>
+        </button>
       </div>
       <svg viewBox={`0 0 ${total} 1`} preserveAspectRatio="none" width="100%" height="18" className="locus-track-svg">
         {shown.map((l, i) => (

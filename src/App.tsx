@@ -26,6 +26,12 @@ function App() {
   const selectedBranch =
     state.dataset && state.app.selectedBranchId ? state.dataset.branches.get(state.app.selectedBranchId) ?? null : null;
 
+  // Clicking a track's own header makes its order the shared one; clicking it
+  // again while already active reverts to file order - a toggle, so there's
+  // always a way back without a separate "file order" control.
+  const toggleSortMode = (clicked: 'rank' | 'metadata' | 'branchPattern') =>
+    dispatch({ type: 'SET_LOCUS_SORT_MODE', mode: state.app.locusSortMode === clicked ? 'chrom' : clicked });
+
   // Computed once here (rather than separately in each consumer) so every
   // panel agrees on exactly which taxa are visible - 'random' mode draws are
   // unseeded, so calling pickSampledTaxa twice could otherwise pick two
@@ -153,6 +159,7 @@ function App() {
                 mode={state.app.locusSortMode}
                 maxPoints={state.app.locusTrackMaxPoints}
                 metadataColumn={state.app.metadataTrackColumn}
+                onHeaderClick={() => toggleSortMode('branchPattern')}
               />
             )}
             {state.app.topologyTrackEnabled && (
@@ -162,6 +169,7 @@ function App() {
                 maxPoints={state.app.locusTrackMaxPoints}
                 metadataColumn={state.app.metadataTrackColumn}
                 branch={selectedBranch}
+                onHeaderClick={() => toggleSortMode('rank')}
               />
             )}
             {state.app.metadataTrackColumn && state.dataset.locusMetadataTable && (
@@ -171,6 +179,7 @@ function App() {
                 maxPoints={state.app.locusTrackMaxPoints}
                 column={state.app.metadataTrackColumn}
                 branch={selectedBranch}
+                onHeaderClick={() => toggleSortMode('metadata')}
               />
             )}
           </>
