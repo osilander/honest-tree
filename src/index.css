@@ -522,6 +522,21 @@ body {
   font-style: italic;
 }
 
+.sampling-caveat {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 12px;
+  margin: 0 0 12px;
+}
+
+.hidden-taxon-tag {
+  color: #92400e;
+  font-style: normal;
+}
+
 .evidence-header {
   display: flex;
   justify-content: space-between;

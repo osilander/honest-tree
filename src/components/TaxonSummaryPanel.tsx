@@ -13,10 +13,12 @@ function resolveTaxon(query: string, taxa: string[]): string | null {
 export function TaxonSummaryPanel({
   dataset,
   query,
+  visibleTaxa,
   onSelectBranch,
 }: {
   dataset: Dataset;
   query: string;
+  visibleTaxa: string[] | null;
   onSelectBranch: (splitId: string) => void;
 }) {
   const taxon = resolveTaxon(query, dataset.taxa);
@@ -49,12 +51,18 @@ export function TaxonSummaryPanel({
     }
   }
   involved.sort((a, b) => b.conflictShare + b.missingShare - (a.conflictShare + a.missingShare));
+  const isHidden = !!visibleTaxa && !visibleTaxa.includes(taxon);
 
   return (
     <div className="evidence-panel">
       <div className="evidence-header">
         <span className="branch-id">{taxon}</span>
       </div>
+      {isHidden && (
+        <p className="sampling-caveat">
+          {taxon} is currently hidden from the tree by the taxon sampler. The evidence below still reflects the full dataset.
+        </p>
+      )}
       <section>
         <h4>Taxon instability</h4>
         <p className="nl-report">

@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import type { AppState, BranchRecord, Dataset, LayoutNode } from '../types';
 import { computeLayout, collectEdges, collectNodes } from '../phylo/layout';
 import { collapseWeakBranches } from '../phylo/collapse';
-import { pickSampledTaxa, pruneTaxaForDisplay } from '../phylo/taxonSample';
+import { pruneTaxaForDisplay } from '../phylo/taxonSample';
 import { findNodeForSplit, rerootAtNode } from '../phylo/reroot';
 import { getSupportMetricValue } from '../phylo/metrics';
 import { encodeBranch } from '../utils/encode';
@@ -40,12 +40,13 @@ export interface HonestTreeHandle {
 interface HonestTreeProps {
   dataset: Dataset;
   appState: AppState;
+  sampledTaxa: string[];
   onHover: (branchId: string | null) => void;
   onSelect: (branchId: string | null) => void;
 }
 
 export const HonestTree = forwardRef<HonestTreeHandle, HonestTreeProps>(function HonestTree(
-  { dataset, appState, onHover, onSelect },
+  { dataset, appState, sampledTaxa, onHover, onSelect },
   ref,
 ) {
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -79,18 +80,6 @@ export const HonestTree = forwardRef<HonestTreeHandle, HonestTreeProps>(function
     if (!appState.collapseWeakBranches) return rerootedRoot;
     return collapseWeakBranches(rerootedRoot, dataset.branches, dataset.taxonIndex, appState.supportMetric, appState.threshold);
   }, [rerootedRoot, dataset, appState.collapseWeakBranches, appState.supportMetric, appState.threshold]);
-
-  const sampledTaxa = useMemo(
-    () =>
-      pickSampledTaxa(
-        dataset,
-        appState.taxonSampleMode,
-        appState.taxonSampleCount,
-        appState.taxonSampleMode === 'custom' ? new Set(appState.taxonSampleCustomSet) : undefined,
-      ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dataset, appState.taxonSampleMode, appState.taxonSampleCount, appState.taxonSampleSeed, appState.taxonSampleCustomSet],
-  );
 
   // Taxa removed here are only hidden from this rendering - recomputing
   // splitIds from scratch on the pruned tree would silently break support

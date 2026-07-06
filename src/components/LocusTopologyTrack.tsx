@@ -33,7 +33,7 @@ export function LocusTopologyTrack({ dataset, mode, maxPoints, metadataColumn, b
     <div className="locus-track">
       <div className="locus-track-header">
         <span className="toolbar-label">
-          Locus topology, {orderLabel(mode, metadataColumn, !!branch)}
+          Whole-tree topology, {orderLabel(mode, metadataColumn, !!branch)}
           {subsampled && ` - showing ${shown.length} of ${loci.length} loci`}
         </span>
       </div>

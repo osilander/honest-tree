@@ -59,6 +59,7 @@ export function BranchEvidencePanel({
   isRerootedHere,
   onRerootHere,
   onResetRoot,
+  visibleTaxa,
 }: {
   branch: BranchRecord | null;
   dataset: Dataset | null;
@@ -68,6 +69,7 @@ export function BranchEvidencePanel({
   isRerootedHere: boolean;
   onRerootHere: () => void;
   onResetRoot: () => void;
+  visibleTaxa: string[] | null;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -80,6 +82,8 @@ export function BranchEvidencePanel({
   }
 
   const missingTaxa = branch.taxonInstability.filter((t) => t.missingCount > 0).sort((a, b) => b.missingShare - a.missingShare);
+  const hiddenCount = dataset && visibleTaxa ? dataset.taxa.length - visibleTaxa.length : 0;
+  const visibleSet = visibleTaxa ? new Set(visibleTaxa) : null;
 
   return (
     <div className="evidence-panel">
@@ -87,6 +91,14 @@ export function BranchEvidencePanel({
         <span className="branch-id">{branch.branchId}</span>
         <span className="conflict-badge">{CONFLICT_LABELS[branch.dominantConflict] ?? branch.dominantConflict}</span>
       </div>
+
+      {hiddenCount > 0 && (
+        <p className="sampling-caveat">
+          Taxon sampler is showing {visibleTaxa!.length} of {dataset!.taxa.length} taxa. Everything below (support, conflict, wandering
+          taxa) is computed from the full taxon set, not just what's currently displayed - taxa marked <em>(hidden)</em> aren't in the
+          current view.
+        </p>
+      )}
 
       <section>
         <div className="section-header-row">
@@ -151,6 +163,7 @@ export function BranchEvidencePanel({
             {branch.taxonInstability.slice(0, 5).map((t) => (
               <li key={t.taxon}>
                 <strong>{t.taxon}</strong>: {describeInstability(t)}
+                {visibleSet && !visibleSet.has(t.taxon) && <em className="hidden-taxon-tag"> (hidden)</em>}
               </li>
             ))}
           </ul>
@@ -190,6 +203,7 @@ export function BranchEvidencePanel({
             {missingTaxa.slice(0, 8).map((t) => (
               <li key={t.taxon}>
                 {t.taxon}: absent in {t.missingCount} loci ({(t.missingShare * 100).toFixed(0)}%)
+                {visibleSet && !visibleSet.has(t.taxon) && <em className="hidden-taxon-tag"> (hidden)</em>}
               </li>
             ))}
           </ul>

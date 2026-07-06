@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from './state/store';
 import { Dropzone } from './components/Dropzone';
 import { Toolbar } from './components/Toolbar';
@@ -10,6 +10,7 @@ import { LocusMetadataTrack } from './components/LocusMetadataTrack';
 import { TaxonSummaryPanel } from './components/TaxonSummaryPanel';
 import { LoadingOverlay } from './components/LoadingOverlay';
 import { MethodsPopover } from './components/MethodsPopover';
+import { pickSampledTaxa } from './phylo/taxonSample';
 
 function App() {
   const { state, dispatch } = useStore();
@@ -24,6 +25,27 @@ function App() {
 
   const selectedBranch =
     state.dataset && state.app.selectedBranchId ? state.dataset.branches.get(state.app.selectedBranchId) ?? null : null;
+
+  // Computed once here (rather than separately in each consumer) so every
+  // panel agrees on exactly which taxa are visible - 'random' mode draws are
+  // unseeded, so calling pickSampledTaxa twice could otherwise pick two
+  // different subsets for the tree vs. the evidence panel.
+  const sampledTaxa = useMemo(() => {
+    if (!state.dataset) return null;
+    return pickSampledTaxa(
+      state.dataset,
+      state.app.taxonSampleMode,
+      state.app.taxonSampleCount,
+      state.app.taxonSampleMode === 'custom' ? new Set(state.app.taxonSampleCustomSet) : undefined,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    state.dataset,
+    state.app.taxonSampleMode,
+    state.app.taxonSampleCount,
+    state.app.taxonSampleSeed,
+    state.app.taxonSampleCustomSet,
+  ]);
 
   return (
     <div className="app-shell">
@@ -82,11 +104,12 @@ function App() {
 
       <div className="main-grid">
         <div className="tree-panel">
-          {state.dataset ? (
+          {state.dataset && sampledTaxa ? (
             <HonestTree
               ref={treeRef}
               dataset={state.dataset}
               appState={state.app}
+              sampledTaxa={sampledTaxa}
               onHover={(id) => dispatch({ type: 'HOVER_BRANCH', branchId: id })}
               onSelect={(id) => dispatch({ type: 'SELECT_BRANCH', branchId: id })}
             />
@@ -99,6 +122,7 @@ function App() {
             <TaxonSummaryPanel
               dataset={state.dataset}
               query={state.app.searchTaxon}
+              visibleTaxa={sampledTaxa}
               onSelectBranch={(splitId) => dispatch({ type: 'SELECT_BRANCH', branchId: splitId })}
             />
           ) : (
@@ -111,6 +135,7 @@ function App() {
               isRerootedHere={!!selectedBranch && state.app.rerootSplitId === selectedBranch.splitId}
               onRerootHere={() => selectedBranch && dispatch({ type: 'SET_REROOT_SPLIT', splitId: selectedBranch.splitId })}
               onResetRoot={() => dispatch({ type: 'SET_REROOT_SPLIT', splitId: null })}
+              visibleTaxa={sampledTaxa}
             />
           )}
         </div>
