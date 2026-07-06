@@ -3,12 +3,23 @@ import { loadDatasetFromText } from '../data/loadDataset';
 import { parseLocusMetadataTable } from '../data/parseLocusMetadata';
 import type { Action } from '../state/store';
 
-const SAMPLE_DATASETS: { file: string; label: string; refFile: string; metadataFile?: string }[] = [
+const SAMPLE_DATASETS: { file: string; label: string; refFile?: string; metadataFile?: string }[] = [
   {
     file: 'mammal-sample-all-cds.nex',
     label: 'Chen et al. (2017) Laurasiatheria — 22 taxa, 1000 loci',
     refFile: 'mammal-sample-all-cds-reference.nwk',
     metadataFile: 'mammal-cds-locus-metadata.tsv',
+  },
+  {
+    file: 'diatoms-sample-cds12.nex',
+    label: 'Roberts et al. (2023) diatoms — 86 taxa, 400 loci',
+    refFile: 'diatoms-sample-cds12-reference.nwk',
+    metadataFile: 'diatoms-cds12-locus-metadata.tsv',
+  },
+  {
+    file: 'aphididae-sample.nex',
+    label: 'Owen & Miller (2022) Aphididae — 51 taxa, 500 loci',
+    metadataFile: 'aphididae-locus-metadata.tsv',
   },
   { file: 'synthetic_25taxa_500loci.nwk', label: 'Synthetic — 25 taxa, 500 loci', refFile: 'synthetic_25taxa_500loci-reference.nwk' },
   { file: 'synthetic_25taxa_5000loci.nwk', label: 'Synthetic — 25 taxa, 5000 loci', refFile: 'synthetic_25taxa_5000loci-reference.nwk' },
@@ -89,7 +100,7 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
         metadataText = await metaRes.text();
       }
 
-      if (useSampleRef && sample) {
+      if (useSampleRef && sample?.refFile) {
         const refRes = await fetch(`${import.meta.env.BASE_URL}sample-data/${sample.refFile}`);
         if (!refRes.ok) throw new Error(`Could not fetch sample reference tree (${refRes.status})`);
         const refText = await refRes.text();
@@ -159,11 +170,13 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
                 {sampleLoading ? 'Loading…' : 'Load'}
               </button>
             </div>
-            <label className="dropzone-sample-refcheck">
-              <input type="checkbox" checked={useSampleRef} onChange={(e) => setUseSampleRef(e.target.checked)} />
-              Use its prebuilt reference tree instead of the default consensus (built from a random half of its gene
-              trees - an independent, but not "true", reconstruction)
-            </label>
+            {SAMPLE_DATASETS.find((s) => s.file === sampleChoice)?.refFile && (
+              <label className="dropzone-sample-refcheck">
+                <input type="checkbox" checked={useSampleRef} onChange={(e) => setUseSampleRef(e.target.checked)} />
+                Use its prebuilt reference tree instead of the default consensus (built from a random half of its gene
+                trees - an independent, but not "true", reconstruction)
+              </label>
+            )}
             {SAMPLE_DATASETS.find((s) => s.file === sampleChoice)?.metadataFile && (
               <label className="dropzone-sample-refcheck">
                 <input type="checkbox" checked={useSampleMetadata} onChange={(e) => setUseSampleMetadata(e.target.checked)} />

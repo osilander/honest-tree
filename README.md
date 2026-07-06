@@ -98,4 +98,50 @@ via `scripts/rebuild-mammal-dataset.ts`:
   GC3%/evolutionary-rate/resolution/completeness subset-membership labels
   (read from its published gene lists, not recomputed).
 
+The diatom gene-tree sample dataset is derived from:
+
+> Roberts, W. R., Ruck, E. C., Downey, K. M., Pinseel, E., & Alverson, A. J.
+> (2023). Resolving Marine-Freshwater Transitions by Diatoms Through a Fog of
+> Gene Tree Discordance. *Systematic Biology*, 72(5), 984-997.
+
+Built via `scripts/rebuild-diatom-dataset.ts` from the paper's own archive
+(the "CDS12 / complete taxon set" analysis - nucleotide codon positions 1+2,
+no taxa dropped for missingness):
+- the sample is a reproducible random 400-gene draw from the 3259 real
+  per-locus ML gene trees that were this analysis's actual ASTRAL input,
+  named after their original orthogroup identifiers;
+- its "prebuilt reference tree" option is the paper's own real ASTRAL
+  species tree for this same analysis - taxon names already match the gene
+  trees exactly, no renaming needed;
+- its "prebuilt metadata" option (`num_taxa`, `tree_length`,
+  `mean_bootstrap_support` per locus) is computed directly from the gene
+  trees themselves - this archive doesn't include the underlying
+  alignments, so nothing alignment-based (GC%, informative sites) is
+  available for this dataset.
+
+The Aphididae gene-tree sample dataset is derived from:
+
+> Owen, C. L., & Miller, G. L. (2022). Phylogenomics of the Aphididae: Deep
+> relationships between subfamilies clouded by gene tree discordance,
+> introgression and the gene tree anomaly zone. First published 17 March
+> 2022.
+
+Built via `scripts/rebuild-aphid-dataset.ts` from the paper's own archive of
+4479 real per-orthogroup ML gene trees (with real bootstrap support):
+- the sample is a reproducible random 500-gene draw, named after their
+  original orthogroup cluster identifiers;
+- its "prebuilt metadata" option (`num_taxa`, `tree_length`,
+  `mean_bootstrap_support` per locus) is computed directly from the gene
+  trees, for the same reason as the diatom set above;
+- **no prebuilt reference tree is offered for this dataset.** The paper's
+  own ASTRAL/concatenated species trees use full species names, while the
+  gene trees use short 4-letter codes, and no official code-to-species
+  table shipped with the archive. A deterministic "first letter of genus +
+  first three of species" rule recovers 44 of the 51 codes seen across the
+  gene trees; the other 7 (e.g. "ADSP", "TASP" - likely genus-level "sp."
+  samples that didn't make it into the final, species-resolved tree) can't
+  be matched with confidence. Rather than ship a reference tree built on 7
+  unverified taxon renames, this dataset keeps the original codes
+  throughout and falls back to the app's own consensus tree.
+
 The synthetic datasets are simulated, not derived from any real study.

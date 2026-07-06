@@ -302,3 +302,41 @@ things were requested and built.
   sampler.
 - Asked to bring the README's "Reference tree" bullet and this summary file
   up to date with everything above (this entry).
+
+## 15. Two more real sample datasets
+
+- Added two new real datasets, downloaded by the user into `testdata/new/`,
+  and asked to organize them into the same minimally-viable shape as the
+  mammal set (concatenated gene trees, plus metadata and a reference tree
+  where possible): Roberts, Ruck, Downey, Pinseel & Alverson (2023,
+  *Systematic Biology*) on diatom marine-freshwater transitions, and Owen &
+  Miller (2022) on Aphididae phylogenomics.
+- For diatoms: found that the paper's own "CDS12 complete" analysis archive
+  already bundled exactly what was needed - 3259 real per-locus ML gene
+  trees, the matching ASTRAL species tree, and a locus-name list, all
+  sharing one consistent taxon-naming scheme (verified: the union of taxa
+  across the gene trees exactly equals the reference tree's taxa, 86 both
+  sides). Built `scripts/rebuild-diatom-dataset.ts`: a reproducible 400-gene
+  sample NEXUS file, the real ASTRAL reference tree, and a metadata table
+  (`num_taxa`, `tree_length`, `mean_bootstrap_support`) computed directly
+  from the gene trees themselves (no alignments are in this archive, so
+  nothing alignment-based like GC% is available here).
+- For Aphididae: found a harder problem - 4479 real per-orthogroup gene
+  trees use short 4-letter taxon codes (e.g. "AFAB"), but the paper's own
+  ASTRAL/concatenated species trees use full species names ("Aphis fabae"),
+  and no official code-to-species table shipped with the archive. Derived a
+  candidate mapping rule (first letter of genus + first three letters of
+  species) and checked it against every code that actually appears in the
+  gene trees: 44 of 51 matched cleanly, but 7 (e.g. "ADSP", "TASP") didn't -
+  most likely genus-level "sp." samples that were dropped before the
+  species-resolved tree was built, so no confident rename exists for them.
+  Decided against shipping a reference tree built on 7 unverified renames;
+  `scripts/rebuild-aphid-dataset.ts` keeps the original codes throughout and
+  omits the reference-tree option entirely, letting the app fall back to
+  its own consensus (the Dropzone's "use prebuilt reference tree" checkbox
+  was made conditional on a sample actually having one, rather than always
+  showing regardless of dataset).
+- Verified both new sample-picker entries end-to-end in the browser (load,
+  reference-tree validation, metadata columns appearing with correct
+  numeric typing) before adding citations for both papers to the README's
+  "Sample data sources" section.
