@@ -1,6 +1,15 @@
 import { useMemo, useState } from 'react';
 import type { BranchRecord, Dataset } from '../types';
-import { HIDDEN_COLOR, METADATA_HIGH_COLOR, METADATA_LOW_COLOR, METADATA_NO_DATA_COLOR, metadataCategoricalColor, metadataNumericColor } from '../utils/color';
+import {
+  ALT_PATTERN_PALETTE,
+  HIDDEN_COLOR,
+  METADATA_HIGH_COLOR,
+  METADATA_LOW_COLOR,
+  METADATA_NO_DATA_COLOR,
+  METADATA_TOO_MANY_CATEGORIES_COLOR,
+  metadataCategoricalColor,
+  metadataNumericColor,
+} from '../utils/color';
 import { clickHoverHint, orderedLoci, subsample, type LocusSortMode } from '../utils/locusOrder';
 
 interface LocusMetadataTrackProps {
@@ -56,6 +65,12 @@ export function LocusMetadataTrack({ dataset, mode, maxPoints, column, branch, o
 
   if (!table || !col) return null;
 
+  // Beyond the palette size, categories would start reusing colors - two
+  // unrelated values would look like the same group, and a legend button per
+  // value (possibly hundreds, e.g. an ID-like column) is clutter, not a useful
+  // toggle. Fall back to one flat neutral color and a plain count instead.
+  const tooManyCategories = col.kind === 'categorical' && categories.length > ALT_PATTERN_PALETTE.length;
+
   const toggleCategory = (cat: string) =>
     setHiddenCategories((prev) => {
       const next = new Set(prev);
@@ -73,6 +88,7 @@ export function LocusMetadataTrack({ dataset, mode, maxPoints, column, branch, o
       const t = max > min ? ((v as number) - min) / (max - min) : 0.5;
       return metadataNumericColor(t);
     }
+    if (tooManyCategories) return METADATA_TOO_MANY_CATEGORIES_COLOR;
     if (hiddenCategories.has(v as string)) return HIDDEN_COLOR;
     return metadataCategoricalColor(categories.indexOf(v as string));
   };
@@ -103,6 +119,11 @@ export function LocusMetadataTrack({ dataset, mode, maxPoints, column, branch, o
           <span className="legend-item" title="Continuous range across loci that have a value for this column.">
             <span className="legend-swatch metadata-gradient-swatch" style={{ background: `linear-gradient(90deg, ${METADATA_LOW_COLOR}, ${METADATA_HIGH_COLOR})` }} />
             {min.toFixed(2)} to {max.toFixed(2)}
+          </span>
+        ) : tooManyCategories ? (
+          <span className="legend-item" title="Too many distinct values to color-code or toggle individually - hover a locus in the track above to see its value.">
+            <span className="legend-swatch" style={{ background: METADATA_TOO_MANY_CATEGORIES_COLOR }} />
+            {categories.length} distinct values - hover for individual values
           </span>
         ) : (
           categories.map((cat, i) => (

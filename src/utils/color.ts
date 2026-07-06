@@ -93,6 +93,11 @@ const METADATA_HIGH = [76, 29, 149]; // violet-900 - high end - kept distinct fr
 export const METADATA_LOW_COLOR = `rgb(${METADATA_LOW.join(',')})`;
 export const METADATA_HIGH_COLOR = `rgb(${METADATA_HIGH.join(',')})`;
 export const METADATA_NO_DATA_COLOR = '#f1f5f9'; // near-white - locus has no value for this column, distinct from any real data point
+// Categorical columns with more distinct values than ALT_PATTERN_PALETTE can
+// color uniquely (e.g. an ID-like column) would otherwise alias two different
+// values to the same color and imply a grouping that isn't real - flat neutral
+// instead of a misleading color, with per-locus values still visible on hover.
+export const METADATA_TOO_MANY_CATEGORIES_COLOR = '#94a3b8'; // slate-400
 
 /** Continuous low->high shading for a numeric locus-metadata column, given a value already normalized to 0..1. */
 export function metadataNumericColor(t: number): string {
