@@ -32,10 +32,12 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
   const [sampleChoice, setSampleChoice] = useState(SAMPLE_DATASETS[0].file);
   const [sampleLoading, setSampleLoading] = useState(false);
   const [refTree, setRefTree] = useState<{ text: string; name: string } | null>(null);
+  const [metadataFile, setMetadataFile] = useState<{ text: string; name: string } | null>(null);
   const [useSampleRef, setUseSampleRef] = useState(false);
   const [useSampleMetadata, setUseSampleMetadata] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const refFileInputRef = useRef<HTMLInputElement | null>(null);
+  const metadataFileInputRef = useRef<HTMLInputElement | null>(null);
 
   const loadFromText = useCallback(
     // refOverride === undefined means "use whatever's in the refTree state" (the
@@ -74,14 +76,19 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
   const handleFile = useCallback(
     async (file: File) => {
       const text = await file.text();
-      loadFromText(text, file.name);
+      loadFromText(text, file.name, undefined, metadataFile?.text);
     },
-    [loadFromText],
+    [loadFromText, metadataFile],
   );
 
   const handleRefFile = useCallback(async (file: File) => {
     const text = await file.text();
     setRefTree({ text, name: file.name });
+  }, []);
+
+  const handleMetadataFile = useCallback(async (file: File) => {
+    const text = await file.text();
+    setMetadataFile({ text, name: file.name });
   }, []);
 
   const handleLoadSample = useCallback(async () => {
@@ -93,7 +100,7 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
 
       const sample = SAMPLE_DATASETS.find((s) => s.file === sampleChoice);
 
-      let metadataText: string | undefined;
+      let metadataText: string | undefined = metadataFile?.text;
       if (useSampleMetadata && sample?.metadataFile) {
         const metaRes = await fetch(`${import.meta.env.BASE_URL}sample-data/${sample.metadataFile}`);
         if (!metaRes.ok) throw new Error(`Could not fetch sample metadata (${metaRes.status})`);
@@ -113,7 +120,7 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
     } finally {
       setSampleLoading(false);
     }
-  }, [sampleChoice, useSampleRef, useSampleMetadata, loadFromText, dispatch]);
+  }, [sampleChoice, useSampleRef, useSampleMetadata, metadataFile, loadFromText, dispatch]);
 
   useEffect(() => {
     function onDragOver(e: DragEvent) {
@@ -181,7 +188,7 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
               <label className="dropzone-sample-refcheck">
                 <input type="checkbox" checked={useSampleMetadata} onChange={(e) => setUseSampleMetadata(e.target.checked)} />
                 Also load its prebuilt per-locus metadata (values such as %GC or other locus, alignment, or tree
-                characteristics - the exact columns vary by dataset)
+                characteristics - the exact columns vary by sample dataset)
               </label>
             )}
           </div>
@@ -207,6 +214,30 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleRefFile(file);
+              }}
+            />
+          </div>
+          <div className="dropzone-reftree">
+            <p className="dropzone-hint">
+              Optional: supply your own per-locus metadata (TSV/CSV) alongside your gene trees - values such as %GC or
+              other locus, alignment, or tree characteristics, matched to loci by name (any row order/subset is fine).
+            </p>
+            {metadataFile ? (
+              <div className="dropzone-reftree-row">
+                <span className="dropzone-reftree-name">✓ {metadataFile.name}</span>
+                <button onClick={() => setMetadataFile(null)}>Remove</button>
+              </div>
+            ) : (
+              <button onClick={() => metadataFileInputRef.current?.click()}>Choose metadata file…</button>
+            )}
+            <input
+              ref={metadataFileInputRef}
+              type="file"
+              accept=".tsv,.csv,.txt"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleMetadataFile(file);
               }}
             />
           </div>
