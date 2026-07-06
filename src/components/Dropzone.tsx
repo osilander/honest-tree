@@ -180,8 +180,8 @@ export function Dropzone({ hasDataset, dispatch }: { hasDataset: boolean; dispat
             {SAMPLE_DATASETS.find((s) => s.file === sampleChoice)?.metadataFile && (
               <label className="dropzone-sample-refcheck">
                 <input type="checkbox" checked={useSampleMetadata} onChange={(e) => setUseSampleMetadata(e.target.checked)} />
-                Also load its prebuilt per-locus metadata (alignment length, GC%, informative sites, subset bucket
-                membership from the source paper)
+                Also load its prebuilt per-locus metadata (values such as %GC or other locus, alignment, or tree
+                characteristics - the exact columns vary by dataset)
               </label>
             )}
           </div>

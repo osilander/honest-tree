@@ -237,14 +237,17 @@ export function Toolbar({
         <div className="toolbar-group">
           <span className="toolbar-label">Sort all shown tracks by</span>
           <div className="radio-row">
-            <label className="radio-option">
+            <label
+              className="radio-option"
+              title='The order loci appear in the input tree file. If that file does not encode real chromosome/genomic position, this is not actually chromosomal order - just file order, assumed to reflect it when no positional data is present.'
+            >
               <input
                 type="radio"
                 name="locusSortMode"
                 checked={appState.locusSortMode === 'chrom'}
                 onChange={() => dispatch({ type: 'SET_LOCUS_SORT_MODE', mode: 'chrom' })}
               />
-              Chromosome order
+              File order
             </label>
             <label className="radio-option" title="Rank by frequency of the whole-tree topology each locus displays.">
               <input
@@ -302,9 +305,9 @@ export function Toolbar({
           <span className="toolbar-label">Locus metadata (optional)</span>
           <p className="dropzone-hint toolbar-metadata-hint">
             Upload a TSV (or CSV): first column = locus name, matched by name not row order, so any order/subset is fine - other columns =
-            any per-locus values (alignment length, GC%, dN/dS, GO category, chromosome, …). For a plain multi-tree Newick input, locus
-            names are "locus_1", "locus_2", … in file order (Newick has no way to name a tree); for NEXUS input, it's whatever name follows
-            "tree" in your file.
+            values such as %GC or other locus, alignment, or tree characteristics. For a plain multi-tree Newick input, locus names are
+            "locus_1", "locus_2", … in file order (Newick has no way to name a tree); for NEXUS input, it's whatever name follows "tree" in
+            your file.
           </p>
           <button className="reset-view-btn" onClick={() => metadataFileInputRef.current?.click()}>
             {metadataTable ? 'Replace metadata file…' : 'Upload metadata file…'}

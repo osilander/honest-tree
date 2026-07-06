@@ -79,7 +79,7 @@ export function orderLabel(mode: LocusSortMode, metadataColumn?: string | null, 
   if (mode === 'branchPattern' && hasBranch) return "grouped by this branch's pattern";
   if (mode === 'metadata' && metadataColumn) return `sorted by ${metadataColumn}`;
   if (mode === 'rank') return 'sorted by rank';
-  return 'file order (chromosome position)';
+  return 'file order';
 }
 
 export function subsample<T>(items: T[], maxPoints: number | null): T[] {

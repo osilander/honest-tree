@@ -39,6 +39,19 @@ export function MethodsPopover() {
                 <dt>Branch lengths</dt>
                 <dd>Averaged per branch from whichever gene trees give a usable reading. Hover a branch to see exact vs. fallback observations.</dd>
 
+                <dt>Locus order</dt>
+                <dd>
+                  "File order" means exactly that - the order loci appear in the input tree file. If that file doesn't encode real
+                  chromosome/genomic position, file order is <em>not</em> chromosomal order; it's simply assumed to stand in for it when no
+                  positional data is present. Per-locus metadata (uploaded or prebuilt) can supply a real position column instead.
+                </dd>
+
+                <dt>Locus metadata</dt>
+                <dd>
+                  Optional, per-locus values such as %GC or other locus, alignment, or tree characteristics - either your own upload or a
+                  dataset's prebuilt table. Exact columns vary by dataset/upload; matched to loci by name, not row order.
+                </dd>
+
                 <dt>Not yet implemented</dt>
                 <dd>Bootstrap support, posterior probability, true quartet-based gCF.</dd>
               </dl>
