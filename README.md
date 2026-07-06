@@ -17,18 +17,14 @@ Then open the printed localhost URL and drag a multi-tree Newick/NEXUS file
 This is a **branch-centric gene-tree conflict browser**, not a formal
 gCF/bootstrap/posterior support viewer (yet). Specifically:
 
-- **Reference tree**: by default, built as a greedy compatible-splits
-  consensus from your input gene/locus trees - clades are added in
-  decreasing frequency order, kept whenever compatible with what's already
-  accepted. This is a different kind of summary than a Bayesian posterior
-  sample or a species-tree inference method, even though the tree looks
-  similar in shape. I.e., there is no population- or species-level model of
-  *why* gene trees disagree (such as incomplete lineage sorting) - it is a
-  frequency tally over the trees you gave it, not a coalescent-aware
-  estimate of the species tree. In particular, under high ILS the true
-  species tree can differ from the most frequent gene tree topology (the
-  "anomaly zone"); this consensus procedure cannot recover that case, by
-  construction.
+- **Reference tree**: by default, a greedy compatible-splits consensus from
+  your input gene trees - clades are added in decreasing frequency order,
+  kept whenever compatible with what's already accepted. There is no model
+  of *why* trees disagree (e.g. incomplete lineage sorting); it's a
+  frequency tally, not a coalescent-aware estimate of the species tree. You
+  can instead supply your own reference tree (e.g. a proper species-tree
+  estimate) when loading data - every branch is then evaluated against that
+  tree instead.
 - **Bring your own reference tree**: instead of the built-in consensus, you
   can supply your own reference tree when loading data (e.g. one inferred
   with ASTRAL, StarBEAST2, or any other coalescent-aware species-tree
@@ -36,13 +32,13 @@ gCF/bootstrap/posterior support viewer (yet). Specifically:
   trees, and no others - individual gene trees are still allowed to have
   missing taxa, only the reference tree's taxon set has to match the full
   union across all of them. Every branch is then evaluated against that
-  tree using the same per-locus
-  classification machinery, regardless of where the reference tree came
-  from - so this is the way to see discordance/anomaly-zone diagnostics
-  against a tree that isn't limited to the majority gene-tree topology.
-  Branch lengths are still always re-estimated from your gene trees (an
-  average across per-locus observations), not taken from the supplied
-  tree's own lengths, so that every branch's length means the same thing.
+  tree using the same per-locus classification machinery, regardless of
+  where the reference tree came from - so this is the way to see
+  discordance against a tree that isn't limited to the majority gene-tree
+  topology. Branch lengths are still always re-estimated from your gene
+  trees (an average across per-locus observations), not taken from the
+  supplied tree's own lengths, so that every branch's length means the same
+  thing.
 - **"Clade recovery" (the `Clade recovery` metric)**: the fraction of
   decisive input trees in which a branch's exact reference clade is
   recovered. This is clade/split recovery frequency, **not** the formal

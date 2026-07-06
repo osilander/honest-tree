@@ -256,3 +256,49 @@ things were requested and built.
   and the metadata table into the sample picker as opt-in checkboxes.
   Left the full 10,259-gene set untracked (~11MB), matching how the file it
   replaced was handled.
+
+## 14. Sort-model simplification, taxon selection, and evidence-panel honesty
+
+- Renamed the mammal sample dataset's dropzone label to cite its source
+  directly ("Chen et al. (2017) Laurasiatheria") instead of "Real - mammal
+  CDS gene trees", and trimmed the Methods popover's "Reference tree" entry
+  down to a shorter statement of the same fact (no population-/species-level
+  model of *why* trees disagree), dropping the "Bayesian posterior"/"anomaly
+  zone" phrasing from that one panel.
+- Replaced the fully independent per-track sort controls built the previous
+  round (each of the three locus tracks - whole-tree topology, per-branch
+  topology, metadata - had its own on/off/order radio group) with a simpler
+  model after direct feedback that the independent version wasn't obvious to
+  use: one on/off toggle per track, plus a single shared "sort all shown
+  tracks by" selector (chromosome order / whole-tree topology rank / branch
+  topology pattern / metadata value) applied uniformly to whichever tracks
+  are visible.
+- Added a "select taxa to include" mode to the taxon sampler - an
+  alphanumerically-sorted checkbox list of every taxon, alongside the
+  existing random/most-diverged/all-taxa modes.
+- Asked how much sense it makes for the branch evidence panel (support,
+  conflict, "wandering taxa") to name taxa that the taxon sampler is
+  currently hiding from the tree. Confirmed this was a real, previously
+  silent mismatch: the sampler only prunes the *display*, while every number
+  and named taxon in the evidence panel is computed from the full dataset
+  regardless. Fixed by lifting the sampled-taxa computation up to a single
+  place (`App.tsx`) so the tree and every evidence panel agree on exactly
+  which taxa are visible (previously each could compute it separately, and
+  the unseeded "random" mode could otherwise pick two different subsets for
+  the same render), then surfacing the mismatch instead of hiding it: an
+  amber caveat banner whenever sampling is active, and a "(hidden)" tag next
+  to any named taxon that isn't currently displayed. Declined to also
+  recompute the underlying statistics restricted to the visible subset, since
+  that would change what a branch's identity even means once taxa are
+  dropped, conflicting with the sampler's existing "display-only, preserve
+  branch identity" design.
+- Renamed the "Locus topology" bar-chart label to "Whole-tree topology" to
+  match the toolbar's own wording for the same track and to disambiguate it
+  from the per-branch topology track's near-identical label.
+- Declined (for now) a requested clade-collapse feature - noted as a
+  reasonable follow-up, distinct from the existing threshold-based
+  weak-branch collapse, but deferred pending a decision on whether it should
+  also stay display-only for the same consistency reason as the taxon
+  sampler.
+- Asked to bring the README's "Reference tree" bullet and this summary file
+  up to date with everything above (this entry).
