@@ -137,6 +137,12 @@ body {
   padding: 8px 16px;
   font-size: 13px;
   border-bottom: 1px solid #fecaca;
+  position: relative;
+  /* Above .dropzone-overlay (position: fixed, z-index: 100) - a load error
+     (e.g. a taxon mismatch) happens exactly when the dropzone overlay is
+     still showing (no dataset loaded yet), so without this the message
+     renders almost entirely hidden behind it. */
+  z-index: 101;
 }
 
 .warnings-banner {

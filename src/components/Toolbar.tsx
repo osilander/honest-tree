@@ -23,16 +23,22 @@ const LOCUS_TRACK_POINT_OPTIONS: { value: string; label: string }[] = [
 
 function ToolbarDropdown({ label, children }: { label: string; children: ReactNode }) {
   const [open, setOpen] = useState(false);
+  const openRef = useRef(open);
+  openRef.current = open;
   const ref = useRef<HTMLDivElement | null>(null);
 
+  // Listener is attached once for the component's whole lifetime (reading
+  // `open` via a ref rather than depending on it) rather than being
+  // conditionally added/removed every time `open` flips - avoids any chance
+  // of a gap between "state says open" and "listener is actually attached".
   useEffect(() => {
-    if (!open) return;
     function onClickOutside(e: MouseEvent) {
+      if (!openRef.current) return;
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     }
     document.addEventListener('mousedown', onClickOutside);
     return () => document.removeEventListener('mousedown', onClickOutside);
-  }, [open]);
+  }, []);
 
   return (
     <div className="toolbar-dropdown" ref={ref}>
