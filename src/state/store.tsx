@@ -23,10 +23,11 @@ const initialAppState: AppState = {
   tipLabelSize: 11,
   branchWidthScale: 1,
   showSupportValues: false,
-  locusTrackMode: 'chrom',
+  topologyTrackMode: 'chrom',
   locusTrackMaxPoints: null,
   branchLocusTrackEnabled: true,
-  branchTrackGroupByPattern: false,
+  branchTrackMode: 'chrom',
+  metadataTrackOrder: 'chrom',
   taxonSampleMode: 'off',
   taxonSampleCount: 15,
   taxonSampleSeed: 0,
@@ -59,10 +60,11 @@ export type Action =
   | { type: 'SET_TIP_LABEL_SIZE'; value: number }
   | { type: 'SET_BRANCH_WIDTH_SCALE'; value: number }
   | { type: 'TOGGLE_SUPPORT_VALUES' }
-  | { type: 'SET_LOCUS_TRACK_MODE'; mode: 'off' | 'chrom' | 'sorted' | 'metadata' }
+  | { type: 'SET_TOPOLOGY_TRACK_MODE'; mode: 'off' | 'chrom' | 'sorted' | 'metadata' }
   | { type: 'SET_LOCUS_TRACK_MAX_POINTS'; value: number | null }
   | { type: 'SET_BRANCH_LOCUS_TRACK_ENABLED'; value: boolean }
-  | { type: 'SET_BRANCH_TRACK_GROUP_BY_PATTERN'; value: boolean }
+  | { type: 'SET_BRANCH_TRACK_MODE'; mode: 'chrom' | 'sorted' | 'metadata' | 'pattern' }
+  | { type: 'SET_METADATA_TRACK_ORDER'; mode: 'chrom' | 'sorted' | 'metadata' }
   | { type: 'SET_TAXON_SAMPLE_MODE'; mode: 'off' | 'random' | 'diverged' }
   | { type: 'SET_TAXON_SAMPLE_COUNT'; value: number }
   | { type: 'RESAMPLE_TAXA' }
@@ -104,14 +106,16 @@ function reducer(state: StoreState, action: Action): StoreState {
       return { ...state, app: { ...state.app, branchWidthScale: action.value } };
     case 'TOGGLE_SUPPORT_VALUES':
       return { ...state, app: { ...state.app, showSupportValues: !state.app.showSupportValues } };
-    case 'SET_LOCUS_TRACK_MODE':
-      return { ...state, app: { ...state.app, locusTrackMode: action.mode } };
+    case 'SET_TOPOLOGY_TRACK_MODE':
+      return { ...state, app: { ...state.app, topologyTrackMode: action.mode } };
     case 'SET_LOCUS_TRACK_MAX_POINTS':
       return { ...state, app: { ...state.app, locusTrackMaxPoints: action.value } };
     case 'SET_BRANCH_LOCUS_TRACK_ENABLED':
       return { ...state, app: { ...state.app, branchLocusTrackEnabled: action.value } };
-    case 'SET_BRANCH_TRACK_GROUP_BY_PATTERN':
-      return { ...state, app: { ...state.app, branchTrackGroupByPattern: action.value } };
+    case 'SET_BRANCH_TRACK_MODE':
+      return { ...state, app: { ...state.app, branchTrackMode: action.mode } };
+    case 'SET_METADATA_TRACK_ORDER':
+      return { ...state, app: { ...state.app, metadataTrackOrder: action.mode } };
     case 'SET_TAXON_SAMPLE_MODE':
       return { ...state, app: { ...state.app, taxonSampleMode: action.mode } };
     case 'SET_TAXON_SAMPLE_COUNT':

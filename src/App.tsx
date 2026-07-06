@@ -117,7 +117,7 @@ function App() {
       </div>
 
       {state.dataset &&
-        (state.app.locusTrackMode !== 'off' ||
+        (state.app.topologyTrackMode !== 'off' ||
           (state.app.branchLocusTrackEnabled && selectedBranch) ||
           (state.app.metadataTrackColumn && state.dataset.locusMetadataTable)) && (
           <>
@@ -125,16 +125,15 @@ function App() {
               <BranchLocusTrack
                 dataset={state.dataset}
                 branch={selectedBranch}
-                mode={state.app.locusTrackMode === 'off' ? 'chrom' : state.app.locusTrackMode}
+                mode={state.app.branchTrackMode}
                 maxPoints={state.app.locusTrackMaxPoints}
                 metadataColumn={state.app.metadataTrackColumn}
-                groupByPattern={state.app.branchTrackGroupByPattern}
               />
             )}
-            {state.app.locusTrackMode !== 'off' && (
+            {state.app.topologyTrackMode !== 'off' && (
               <LocusTopologyTrack
                 dataset={state.dataset}
-                mode={state.app.locusTrackMode}
+                mode={state.app.topologyTrackMode}
                 maxPoints={state.app.locusTrackMaxPoints}
                 metadataColumn={state.app.metadataTrackColumn}
               />
@@ -142,7 +141,7 @@ function App() {
             {state.app.metadataTrackColumn && state.dataset.locusMetadataTable && (
               <LocusMetadataTrack
                 dataset={state.dataset}
-                mode={state.app.locusTrackMode === 'off' ? 'chrom' : state.app.locusTrackMode}
+                mode={state.app.metadataTrackOrder}
                 maxPoints={state.app.locusTrackMaxPoints}
                 column={state.app.metadataTrackColumn}
               />

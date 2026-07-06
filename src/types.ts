@@ -179,11 +179,14 @@ export interface AppState {
   tipLabelSize: number;
   branchWidthScale: number;
   showSupportValues: boolean;
-  locusTrackMode: 'off' | 'chrom' | 'sorted' | 'metadata';
+  /** Visibility + order for the global (whole-tree) locus topology track. 'off' hides it entirely. */
+  topologyTrackMode: 'off' | 'chrom' | 'sorted' | 'metadata';
   locusTrackMaxPoints: number | null;
   branchLocusTrackEnabled: boolean;
-  /** When true, the per-branch topology track groups loci by this branch's own classification (reference/alt/uninformative/missing) instead of the shared chrom/rank/metadata order. */
-  branchTrackGroupByPattern: boolean;
+  /** Order for the per-branch topology track (visibility is branchLocusTrackEnabled). 'pattern' groups by this branch's own classification (reference/alt/uninformative/missing) instead of a dataset-wide order. */
+  branchTrackMode: 'chrom' | 'sorted' | 'metadata' | 'pattern';
+  /** Order for the locus metadata track (visibility is metadataTrackColumn !== null). */
+  metadataTrackOrder: 'chrom' | 'sorted' | 'metadata';
   taxonSampleMode: 'off' | 'random' | 'diverged';
   taxonSampleCount: number;
   taxonSampleSeed: number;

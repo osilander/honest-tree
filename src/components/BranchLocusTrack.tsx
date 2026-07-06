@@ -4,18 +4,21 @@ import { HIDDEN_COLOR, MISSING_COLOR, OTHER_COLOR, UNINFORMATIVE_COLOR } from '.
 import { orderLabel, orderedLoci, subsample, type LocusOrderMode } from '../utils/locusOrder';
 import { patternColor, patternLabel, patternTag, withAltRanks } from '../utils/pattern';
 
+export type BranchTrackMode = LocusOrderMode | 'pattern';
+
 interface BranchLocusTrackProps {
   dataset: Dataset;
   branch: BranchRecord;
-  mode: LocusOrderMode;
+  mode: BranchTrackMode;
   maxPoints: number | null;
   metadataColumn: string | null;
-  groupByPattern: boolean;
 }
 
-export function BranchLocusTrack({ dataset, branch, mode, maxPoints, metadataColumn, groupByPattern }: BranchLocusTrackProps) {
+export function BranchLocusTrack({ dataset, branch, mode, maxPoints, metadataColumn }: BranchLocusTrackProps) {
   const ranked = withAltRanks(branch.topologyPatterns);
-  const baseNames = orderedLoci(dataset, mode, metadataColumn);
+  const groupByPattern = mode === 'pattern';
+  const baseMode: LocusOrderMode = mode === 'pattern' ? 'chrom' : mode;
+  const baseNames = orderedLoci(dataset, baseMode, metadataColumn);
 
   // Optionally group loci by this branch's own classification (reference,
   // then each alternative by rank, then other/uninformative/missing) -
@@ -76,7 +79,7 @@ export function BranchLocusTrack({ dataset, branch, mode, maxPoints, metadataCol
     <div className="locus-track">
       <div className="locus-track-header">
         <span className="toolbar-label">
-          {branch.branchId} topology, {groupByPattern ? 'grouped by this branch’s pattern' : orderLabel(mode, metadataColumn)}
+          {branch.branchId} topology, {mode === 'pattern' ? 'grouped by this branch’s pattern' : orderLabel(mode, metadataColumn)}
           {subsampled && ` - showing ${shown.length} of ${names.length} loci`}
         </span>
       </div>
